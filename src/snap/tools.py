@@ -19,7 +19,9 @@ Only use JSON when you need a tool, as one single object and nothing else:
 - calculate: {"tool": "calculate", "args": {"expression": "<arithmetic, e.g. 2400*0.15>"}}
 - convert: {"tool": "convert", "args": {"value": <number>, "from_unit": "km|mi|kg|lb|c|f", "to_unit": "..."}}
 - search_notes: {"tool": "search_notes", "args": {"query": "<topic>"}} — searches the user's personal notes
-Use a tool for math, unit conversions, or questions about the user's notes."""
+Use a tool for math, unit conversions, or questions about the user's notes.
+Keep replies short — this is a voice assistant.
+/no_think"""
 
 
 # --- individual tools -------------------------------------------------------
