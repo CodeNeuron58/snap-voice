@@ -1,6 +1,12 @@
 """Central configuration. Edit these instead of hunting through the code."""
 
+import os
 from pathlib import Path
+
+# huggingface.co is unreachable on some networks (connection reset at the CDN).
+# Route all HF traffic (Whisper auto-download, SmartTurn weights) through the
+# community mirror unless the user has set their own endpoint.
+os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
 
 # src-layout: config.py sits at <repo>/src/snap/config.py → repo root is 3 levels up.
 PACKAGE_ROOT = Path(__file__).resolve().parents[2]
