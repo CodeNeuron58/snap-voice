@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+
+# Models & downloaded weights — never commit (GGUF, ONNX, smart-turn)
+data/models/
+*.onnx
+
+# Bench outputs (regenerated; curated evidence goes to docs/evidence/)
+bench_results*.json
+
+# Secrets & local state
+.env
+*.part

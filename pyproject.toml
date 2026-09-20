@@ -1,0 +1,39 @@
+[project]
+name = "snap-voice"
+version = "0.1.0"
+description = "Snap — fully offline, NPU-first voice assistant (Snapdragon AI Lab Build & Present Challenge entry)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = [
+    # everything needed to RUN snap lives here — one plain `uv sync` gets you a working app
+    "numpy>=1.26",
+    "faster-whisper>=1.1",                 # STT (CPU spike); >=1.1 knows the large-v3-turbo checkpoint
+    "llama-cpp-python==0.3.35",            # Qwen3 GGUF runtime (CPU spike) — see [tool.uv.sources] below
+    "sounddevice",                         # mic capture + legacy loop playback
+    "onnxruntime>=1.17",                   # Silero VAD (bundled ONNX); QNN EP lands here later
+    "pipecat-ai[silero,piper]>=0.0.60",    # product voice loop: transport, VAD, interruptions; brings piper-tts
+    "transformers>=4.44",                  # SmartTurn feature extractor (numpy-only path, does NOT pull torch)
+]
+
+[project.optional-dependencies]
+aihub = ["qai-hub"]  # profiling on hosted Snapdragon devices — needed for the challenge evidence (scripts/profile_on_aihub.py)
+
+[tool.uv.sources]
+# PyPI ships no Windows wheel for llama-cpp-python (uv would compile C++ for ~30min).
+# Pin to the author's prebuilt win_amd64 wheel instead. ARM64 later: switch to GenieX/NPU
+# path or revisit when this repo publishes ARM wheels.
+llama-cpp-python = { url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.35/llama_cpp_python-0.3.35-py3-none-win_amd64.whl" }
+
+[dependency-groups]
+dev = ["ruff", "pytest"]
+
+[project.scripts]
+snap = "snap.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/snap"]
