@@ -22,10 +22,12 @@ WHISPER_MODEL = "small"
 WHISPER_MODEL_QUALITY = "large-v3-turbo"  # used by the --quality CLI flag
 WHISPER_LANGUAGE = None          # None = auto-detect EN/HI
 
-# LLM (locked 2026-09-14). CPU spike: GGUF below. NPU build: GenieX/QAIRT —
-# `geniex infer ai-hub-models/Qwen3-1.7B` (X2 Elite CRD: prefill 4298 tok/s, decode 68.4 tok/s).
-# Quality upgrade path: Qwen3-4B-Instruct-2507 (only if NPU decode profiles allow).
-LLM_GGUF = MODELS_DIR / "qwen3" / "qwen3-1.7b-q4_k_m.gguf"  # download from Hugging Face
+# LLM (upgraded 2026-09-21 to Qwen3-4B-Instruct-2507 — AI Hub X2 Elite CRD: prefill 2,831
+# tok/s, decode 42.6 tok/s, on-device accuracy 86.4% vs 1.7B's 73%). Instruct-only = no
+# think-mode (THINK_STRIP stays as a safety net). NPU build: `geniex infer
+# ai-hub-models/Qwen3-4B-Instruct-2507`. Fallback: the 1.7B GGUF below (one-line swap).
+LLM_GGUF = MODELS_DIR / "qwen3-4b-instruct" / "qwen3-4b-instruct-2507-q4_k_m.gguf"
+# LLM_GGUF = MODELS_DIR / "qwen3" / "qwen3-1.7b-q4_k_m.gguf"  # fallback, smaller/faster
 LLM_N_CTX = 4096
 LLM_N_THREADS = 6
 LLM_MAX_TOKENS = 256
