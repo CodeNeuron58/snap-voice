@@ -19,8 +19,9 @@ from datetime import datetime, timezone
 import numpy as np
 
 from snap import config, tools
-from snap.pc.sentence_stream import SentenceSegmenter
+from snap.pc.sentence_stream import THINK_BLOCK, SentenceSegmenter
 from snap.timing import TIMINGS
+
 
 from pipecat.frames.frames import (
     Frame,
@@ -161,8 +162,8 @@ class SnapLlamaLLM(LLMService):
         ]
         # Prompt hygiene, KV-cache aware: append-only by default (llama.cpp reuses
         # the cached prefix); trim rarely and in chunks so invalidation is rare.
-        if len(self._history) > 24:
-            del self._history[:8]
+        if len(self._history) > 12:
+            del self._history[:4]
 
     async def warm_up(self) -> None:
         """One 1-token completion so chat-template + compute-graph caches are hot."""
@@ -185,13 +186,28 @@ class SnapLlamaLLM(LLMService):
         """One full turn: stream tokens, emit sentences, route tool JSON. Returns reply.
 
         `emit` may be sync (text mode) or async (pipeline); normalized here.
-        Thinking blocks (`<think>…`) are stripped before speech by the segmenter.
+        The segmenter is the single gatekeeper of what's speakable: think blocks
+        are stripped by it, and JSON-looking chunks are dropped at emit time —
+        tool calls can arrive after a <think> block, so first-token sniffing
+        is not reliable. Think text is also stripped from raw before history.
         """
         if not asyncio.iscoroutinefunction(emit):
             sync_emit = emit
 
             async def emit(sentence: str) -> None:  # noqa: F811 — normalized wrapper
                 sync_emit(sentence)
+
+        async def emit_speakable(sentence: str) -> None:
+            if sentence.lstrip().startswith("{") or '{"tool"' in sentence:
+                return  # raw tool JSON never reaches speech; router speaks the result
+            await emit(sentence)
+
+        # Deterministic answers never touch the LLM: instant, hallucination-free.
+        pre = tools.pre_route(user_text)
+        if pre is not None:
+            await emit(pre)
+            self._remember(user_text, pre)
+            return pre
 
         self._cancel.clear()
         messages = self._messages_for(user_text)
@@ -211,7 +227,6 @@ class SnapLlamaLLM(LLMService):
         t0 = time.perf_counter()
         collected: list[str] = []
         segmenter = SentenceSegmenter()
-        tool_mode: bool | None = None  # decided by the first non-empty token
         first_token_done = False
 
         while True:
@@ -222,22 +237,17 @@ class SnapLlamaLLM(LLMService):
                 TIMINGS.record("llm_first_token", (time.perf_counter() - t0) * 1000)
                 first_token_done = True
             collected.append(token)
-            if tool_mode is None and token.strip():
-                # A tool call is one JSON object — mute sentence streaming; the
-                # router speaks the templated result below.
-                tool_mode = token.lstrip().startswith("{")
-            if not tool_mode:
-                for sentence in segmenter.feed(token):
-                    await emit(sentence)
-        if tool_mode is None:
-            tool_mode = False
+            for sentence in segmenter.feed(token):
+                await emit_speakable(sentence)
         TIMINGS.record("llm_total", (time.perf_counter() - t0) * 1000)
 
-        raw = "".join(collected).strip()
-        if not tool_mode:
-            tail = segmenter.flush()
-            if tail:
-                await emit(tail)
+        tail = segmenter.flush()
+        if tail:
+            await emit_speakable(tail)
+
+        # Think text must not reach routing or history: an unterminated <think>
+        # (token budget exhausted mid-thought) otherwise becomes the "reply".
+        raw = THINK_BLOCK.sub("", "".join(collected), count=1).strip()
         reply = tools.route(raw) if raw else "…"
         if reply and reply != raw:  # tool path: templated result, no second LLM pass
             await emit(reply)

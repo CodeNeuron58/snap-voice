@@ -16,7 +16,7 @@ import threading
 import numpy as np
 
 from snap import config, tools
-from snap.pc.sentence_stream import SentenceSegmenter
+from snap.pc.sentence_stream import THINK_BLOCK, SentenceSegmenter
 from snap.timing import TIMINGS
 
 
@@ -47,6 +47,17 @@ class Snap:
     # --- one full conversational turn ---------------------------------------
 
     def turn(self, user_text: str) -> str:
+        # Deterministic answers never touch the LLM: instant, hallucination-free.
+        pre = tools.pre_route(user_text)
+        if pre is not None:
+            self.tts.speak(pre, threading.Event())
+            self.history += [
+                {"role": "user", "content": user_text},
+                {"role": "assistant", "content": pre},
+            ]
+            print(f"[Snap] {pre}\n")
+            return pre
+
         messages = self.history + [{"role": "user", "content": user_text}]
 
         stop_tts = threading.Event()
@@ -72,37 +83,33 @@ class Snap:
 
         collected: list[str] = []
         segmenter = SentenceSegmenter()
-        tool_mode: bool | None = None  # decided by the first non-empty token
         state = {"first_token": False}
         t0 = TIMINGS.now_ms()
 
+        def speakable(sentence: str) -> bool:
+            return not sentence.lstrip().startswith("{")  # raw JSON never reaches speech
+
         def on_token(token: str) -> None:
-            nonlocal tool_mode
             if not state["first_token"] and token.strip():
                 TIMINGS.record("llm_first_token", TIMINGS.now_ms() - t0)
                 state["first_token"] = True
             collected.append(token)
-            if tool_mode is None and token.strip():
-                # A tool call is one JSON object — mute streaming; the router
-                # speaks the templated result below.
-                tool_mode = token.lstrip().startswith("{")
-            if tool_mode:
-                return
             for sentence in segmenter.feed(token):
-                sentences.put(sentence)
+                if speakable(sentence):
+                    sentences.put(sentence)
 
         raw = self.llm.stream_reply(messages, on_token=on_token).strip()
-        if tool_mode is None:
-            tool_mode = False
         TIMINGS.record("llm_total", TIMINGS.now_ms() - t0)
 
-        if not tool_mode:
-            tail = segmenter.flush()
-            if tail:
-                sentences.put(tail)
+        tail = segmenter.flush()
+        if tail and speakable(tail):
+            sentences.put(tail)
         tts_done.set()
         speaker.join(timeout=30)
 
+        # Think text must not reach routing or history (unterminated <think> from
+        # token-budget exhaustion would otherwise become the "reply").
+        raw = THINK_BLOCK.sub("", raw, count=1).strip()
         reply = tools.route(raw) if raw else "…"
         if reply and reply != raw:  # tool path: speak the templated result now
             self.tts.speak(reply, stop_tts)
@@ -112,8 +119,8 @@ class Snap:
             {"role": "assistant", "content": reply},
         ]
         # KV-cache aware trim: append-only by default, rare chunked invalidation.
-        if len(self.history) > 25:
-            del self.history[:8]
+        if len(self.history) > 13:
+            del self.history[:4]
         print(f"[Snap] {reply}\n")
         return reply
 

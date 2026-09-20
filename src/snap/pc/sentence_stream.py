@@ -31,6 +31,10 @@ _CLAUSE_BOUNDARY = re.compile(r"(?<=[,;:])\s+")
 # boundary so speech starts before the model stops for breath.
 _MAX_PENDING_CHARS = 240
 
+# For post-hoc cleanup: strips a complete OR unterminated <think> block
+# (budget exhaustion mid-thought) from a raw LLM stream.
+THINK_BLOCK = re.compile(r"<think(?:ing)?>.*?(?:</think(?:ing)?>|\Z)", re.S | re.I)
+
 
 def _partial_marker_len(text: str, shapes: tuple[str, ...]) -> int:
     """Length of ``text``'s suffix that could still grow into a full marker."""
