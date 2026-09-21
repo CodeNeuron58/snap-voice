@@ -67,12 +67,16 @@ def cmd_chat(args: argparse.Namespace) -> None:
 
 
 def cmd_bench(args: argparse.Namespace) -> None:
-    assistant = build_assistant(quality_stt=args.quality)
+    assistant = build_assistant(with_audio=False, quality_stt=args.quality)
     print("Warming up (model load, allocations)...")
     assistant.turn("Hello.")
     TIMINGS.clear()
 
     for run in range(args.runs):
+        # Fresh conversation per run: a 30-turn session degrades small-model
+        # coherence (observed: notes-denial, self-contradiction, emoji slips).
+        # Demo reality is short fresh conversations — measure that.
+        assistant.history = assistant.history[:1]
         for prompt in BENCH_PROMPTS:
             print(f"[bench] run {run + 1}/{args.runs}: {prompt[:48]}")
             assistant.turn(prompt)
