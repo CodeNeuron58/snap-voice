@@ -53,6 +53,7 @@ class Timings:
             "ttt_text_latency_s": seconds("llm_first_token"),
             "llm_total_s": seconds("llm_total"),
             "tts_latency_s": seconds("tts") or seconds("tts_console"),
+            "tool_answer_no_llm_s": seconds("tool_answer_no_llm"),
             "total_latency_s": seconds("utterance_to_first_audio"),
         }
 

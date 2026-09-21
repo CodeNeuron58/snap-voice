@@ -47,9 +47,11 @@ class Snap:
     # --- one full conversational turn ---------------------------------------
 
     def turn(self, user_text: str) -> str:
+        t0 = TIMINGS.now_ms()
         # Deterministic answers never touch the LLM: instant, hallucination-free.
         pre = tools.pre_route(user_text)
         if pre is not None:
+            TIMINGS.record("tool_answer_no_llm", TIMINGS.now_ms() - t0)
             self.tts.speak(pre, threading.Event())
             self.history += [
                 {"role": "user", "content": user_text},
@@ -83,21 +85,18 @@ class Snap:
 
         collected: list[str] = []
         segmenter = SentenceSegmenter()
-        state = {"first_token": False}
-        t0 = TIMINGS.now_ms()
 
         def speakable(sentence: str) -> bool:
             return not sentence.lstrip().startswith("{")  # raw JSON never reaches speech
 
         def on_token(token: str) -> None:
-            if not state["first_token"] and token.strip():
-                TIMINGS.record("llm_first_token", TIMINGS.now_ms() - t0)
-                state["first_token"] = True
             collected.append(token)
             for sentence in segmenter.feed(token):
                 if speakable(sentence):
                     sentences.put(sentence)
 
+        # First-token timing is owned by stream_reply's stage (prefill-inclusive);
+        # recording it here too double-counts under the same key.
         raw = self.llm.stream_reply(messages, on_token=on_token).strip()
         TIMINGS.record("llm_total", TIMINGS.now_ms() - t0)
 

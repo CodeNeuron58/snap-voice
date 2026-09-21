@@ -202,9 +202,11 @@ class SnapLlamaLLM(LLMService):
                 return  # raw tool JSON never reaches speech; router speaks the result
             await emit(sentence)
 
+        t0 = time.perf_counter()
         # Deterministic answers never touch the LLM: instant, hallucination-free.
         pre = tools.pre_route(user_text)
         if pre is not None:
+            TIMINGS.record("tool_answer_no_llm", (time.perf_counter() - t0) * 1000)
             await emit(pre)
             self._remember(user_text, pre)
             return pre
@@ -224,7 +226,6 @@ class SnapLlamaLLM(LLMService):
 
         threading.Thread(target=worker, daemon=True).start()
 
-        t0 = time.perf_counter()
         collected: list[str] = []
         segmenter = SentenceSegmenter()
         first_token_done = False
