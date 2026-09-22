@@ -21,3 +21,6 @@ bench_results*.json
 # Secrets & local state
 .env
 *.part
+
+# Runtime user memories (created by the add_note tool)
+data/notes/memory.md
