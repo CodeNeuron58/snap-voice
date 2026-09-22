@@ -36,16 +36,32 @@ uv run snap chat --legacy --mic    # custom loop without pipecat (the ARM64 fall
 
 ## Architecture
 
+```mermaid
+flowchart TB
+    U["User: speaks or types"] --> VAD["Silero VAD + SmartTurn end-of-turn<br/>(barge-in kills generation instantly)"]
+    VAD --> STT["STT - faster-whisper<br/>small (default) or large-v3-turbo (--quality)"]
+    STT --> PRE{"Arithmetic or unit<br/>conversion?"}
+    PRE -- "yes" --> FAST["Deterministic answer<br/>0.1 ms, zero LLM tokens"]
+    PRE -- "no" --> LLM["LLM - Qwen3-4B-Instruct GGUF via llama.cpp<br/>streams tokens; tool schemas ride in the system prompt"]
+    LLM --> SEG{"SentenceSegmenter:<br/>think-blocks and tool tags stripped"}
+    SEG -- "sentence closes" --> TTS["TTS - Piper, streaming per sentence<br/>(console fallback in text mode)"]
+    SEG -- "tool call in stream" --> EXEC["Local tools, schema-driven:<br/>calculate / convert / search_notes / add_note / get_datetime"]
+    EXEC -- "deterministic tool:<br/>template speaks, no 2nd pass" --> FAST
+    EXEC -- "observation tool:<br/>result fed back (max 2 hops,<br/>errors self-correct)" --> LLM
+    TTS --> OUT["Speaker"]
 ```
-mic ──> pipecat LocalAudioTransport + Silero VAD (interruptions handled by the framework)
-    ──> SnapWhisperSTT      faster-whisper small int8 (CPU spike) → QNN w8a16 on NPU (AI Hub compile)
-    ──> SnapLlamaLLM        Qwen3-1.7B GGUF via llama.cpp (CPU spike) → GenieX/QAIRT on NPU
-    │         └─ <tool_call>? → schema-driven local tools: calculate / convert /
-    │            notes search + memory / date-time (Hermes-style protocol, bounded
-    │            loop; deterministic tools answer from templates with NO second LLM
-    │            pass — tags and JSON are never spoken raw)
-    ──> piper TTS (CPU, chunked) ──> speaker
-         └─ TranscriptionMark / FirstAudioMeasure probes record TTFA into the benchmark table
+
+### Two interchangeable runtimes, one core
+
+```mermaid
+flowchart LR
+    subgraph R["Both runtimes wrap the identical turn pipeline above"]
+        direction TB
+        A["pipecat runtime (default)<br/>snap chat --mic / --text<br/>transport, VAD, turn-taking, barge-in"]
+        B["legacy runtime (ARM64 fallback)<br/>snap chat --legacy --mic / --text<br/>dependency-free custom loop"]
+    end
+    A --> C["Shared core:<br/>tool registry - SentenceSegmenter -<br/>Whisper - Qwen3 GGUF - timing/bench"]
+    B --> C
 ```
 
 pipecat owns the loop (transport, VAD, turn-taking, interruptions); Snap owns the two NPU-bound
