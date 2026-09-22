@@ -2,8 +2,10 @@
 
 [![CI](https://github.com/CodeNeuron58/snap-voice/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeNeuron58/snap-voice/actions/workflows/ci.yml)
 
-**Snap. On-device AI, in a snap.** A fully-offline, NPU-first voice assistant — conversation plus a
-small local tool layer (calculate, convert, search your notes). Built as an entry for the
+**Snap. On-device AI, in a snap.** A fully-offline, NPU-first voice assistant built for
+**Snapdragon-powered HP PCs** (Windows on Snapdragon ARM64, HP OmniBook class): conversation plus a
+small local tool layer (calculate, convert, search your notes), with every heavy stage quantized
+and bound for the Hexagon NPU. Built as an entry for the
 Snapdragon® AI Lab Build & Present Challenge 2026.
 
 > Independent open-source project. Not affiliated with Snap Inc. or Qualcomm.
@@ -48,6 +50,11 @@ pipecat owns the loop (transport, VAD, turn-taking, interruptions); Snap owns th
 stages as custom pipecat services plus per-stage latency probes. `snap chat --legacy` runs the
 same models through a dependency-free custom loop — kept as the Windows-ARM64 fallback in case
 pipecat's native deps can't go native-ARM64 on the Snapdragon machine (day-1 wheel check).
+
+**Target hardware:** the Hexagon NPU in Snapdragon X / X2 Elite (the silicon of Snapdragon-powered
+HP OmniBooks, Windows on Snapdragon ARM64). The current CPU spike runs the identical interfaces on
+x64 today; the NPU runtimes slot in behind the same classes with no pipeline changes
+(`scripts/profile_on_aihub.py` produces the hosted-device evidence).
 
 ### Version notes (pipecat moves fast — read before first import)
 
@@ -98,13 +105,35 @@ Modern `src/` layout — the installable package lives in `src/snap/`, runtime d
 Strategy, build plan, submission checklist: kept separately in the ZCode workspace under
 `snapdragon-challenge/` (`C:\Users\bipra\.zcode\workspace\default\snapdragon-challenge`).
 
-## Lineage (adapted from the author's project Yumi, MIT)
+## Provenance (predecessor + what changed)
 
-- `snap/pc/sentence_stream.py` — SentenceSegmenter: token→sentence streaming with `<think>`-block
-  stripping (Qwen3 thinks out loud otherwise) + clause-boundary flush; Hindi Danda added.
-- `snap/turn.py` — Smart Turn v3 (pipecat-ai ONNX, ~9 MB): prosodic end-of-turn for `--legacy --mic`.
-- `snap/vad.py` + `snap/assets/models/silero_vad.onnx` — torch-free Silero v5 VAD; keeps the legacy
-  fallback path native-ARM64-capable (onnxruntime wheels exist where torch's may not).
+Snap is the author's own work. It is a significant rework of the author's earlier MIT
+open-source project **[Yumii](https://github.com/CodeNeuron58/Yumii)** (a FastAPI/LangGraph
+cloud voice agent), rebuilt for this challenge around on-device AI models from open-source
+platforms — the engine itself was **not** forked (it was too FastAPI/LangGraph-coupled for an
+NPU-first, offline target).
+
+**Carried over from Yumii** — three small, same-author MIT modules, each adapted:
+
+- `snap/pc/sentence_stream.py` — SentenceSegmenter: token→sentence streaming with
+  `<think>`-block stripping (Qwen3 thinks out loud otherwise) + clause-boundary flush;
+  Hindi Danda added for Snap.
+- `snap/turn.py` — Smart Turn v3 (pipecat-ai ONNX, ~9 MB): prosodic end-of-turn for
+  `--legacy --mic`.
+- `snap/vad.py` + `snap/assets/models/silero_vad.onnx` — torch-free Silero v5 VAD; keeps the
+  legacy fallback path native-ARM64-capable (onnxruntime wheels exist where torch's may not).
+
+**Built new for Snap** — the significant modification (the entire on-device model stack and
+pipeline):
+
+- STT: faster-whisper small / large-v3-turbo (CPU today) → QNN w8a16 on Hexagon NPU via
+  Qualcomm AI Hub compile; LLM: Qwen3-4B-Instruct-2507 GGUF via llama.cpp → GenieX/QAIRT on NPU.
+- The pipecat voice pipeline (Silero VAD, turn-taking, barge-in) with custom STT/LLM services
+  plus a dependency-free legacy fallback loop.
+- The deterministic local tool layer (calculate / convert / notes search) with a strict JSON
+  protocol — results spoken from templates, no second LLM pass.
+- Per-stage latency instrumentation, benchmark harness (`snap bench`), boot preflight,
+  unit tests, and CI.
 
 ## Development
 

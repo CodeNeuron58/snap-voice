@@ -1,7 +1,7 @@
 [project]
 name = "snap-voice"
 version = "0.1.0"
-description = "Snap — fully offline, NPU-first voice assistant (Snapdragon AI Lab Build & Present Challenge entry)"
+description = "Snap — fully offline, NPU-first voice assistant for Snapdragon-powered HP PCs (Snapdragon AI Lab Build & Present Challenge entry)"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
