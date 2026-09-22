@@ -36,16 +36,7 @@ LLM_MAX_TOKENS = 256
 # Point PIPER_VOICE at a local .onnx voice; empty = console fallback for the spike.
 PIPER_VOICE = ""
 
-# Turn taking (spike: energy-based; swap to a smart-turn model later)
-SILENCE_END_OF_TURN_MS = 700
-MAX_UTTERANCE_MS = 12_000
-SAMPLE_RATE = 16_000
-
-# Mic mode (Silero VAD + SmartTurn)
-VAD_SPEECH_THRESHOLD = 0.5         # Silero speech probability gate
-SMART_TURN_ENABLED = True          # prosodic end-of-turn; auto-disables if models/deps missing
-SMART_TURN_CHECK_SILENCE_MS = 250  # Deepgram-style aggressive: first check after 250ms of silence
-SMART_TURN_RECHECK_MS = 150        # re-check cadence while silence continues
+SAMPLE_RATE = 16_000               # Whisper / VAD sample rate
 
 # pipecat pipeline: Silero VAD end-of-speech (Deepgram agents use ~300ms endpointing)
 VAD_STOP_SECS = 0.45

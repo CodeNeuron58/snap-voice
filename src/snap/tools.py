@@ -310,7 +310,7 @@ def execute_round(raw: str) -> ToolRound | None:
 def speakable(sentence: str) -> str | None:
     """Cleaned speakable text for a streamed sentence — None for tool JSON/tags.
 
-    Shared by both paths (pipecat + legacy) so what counts as speakable can't drift.
+    Single gatekeeper for the voice path so what counts as speakable can't drift.
     """
     cleaned = TOOL_CALL_BLOCK.sub("", sentence).strip()
     if not cleaned or cleaned.lstrip().startswith("{"):

@@ -1,14 +1,14 @@
 """Snap CLI.
 
-    snap chat --text            # Day-1 latency spike (pipecat LLM service, typed input)
+    snap chat --text            # typed conversation (pipecat LLM service, no audio deps)
     snap chat --mic             # full pipecat voice pipeline: VAD, STT, LLM, TTS, barge-in
     snap chat --mic --quality   # Whisper-Large-V3-Turbo STT (better accuracy, TTFA ~1.4s)
-    snap chat --legacy --mic    # custom loop (no pipecat) — the ARM64 fallback path
     snap bench                  # fixed prompt set, per-stage medians -> benchmark table
-    snap bench --quality        # same, with Turbo STT (write-up: compare both)
+    snap bench --no-preroute    # measure the LLM tool-JSON path instead of the pre-router
 """
 
 import argparse
+import asyncio
 import json
 import logging
 import sys
@@ -31,26 +31,6 @@ BENCH_PROMPTS = [
 ]
 
 
-def build_assistant(with_audio: bool, quality_stt: bool = False):
-    """--legacy path: the custom loop (no pipecat). Kept as the ARM64 fallback."""
-    from snap.pipeline import Snap
-    from snap.stages.llamacpp_llm import LlamaCppLLM
-    from snap.stages.tts import ConsoleTTS, PiperTTS
-
-    stt = None
-    if with_audio:
-        from snap.stages.whisper_stt import FasterWhisperSTT
-
-        model_size = config.WHISPER_MODEL_QUALITY if quality_stt else config.WHISPER_MODEL
-        stt = FasterWhisperSTT(model_size=model_size)
-    tts = (
-        PiperTTS(str(config.PIPER_VOICE))
-        if config.PIPER_VOICE and Path(config.PIPER_VOICE).exists()
-        else ConsoleTTS()
-    )
-    return Snap(stt=stt, llm=LlamaCppLLM(), tts=tts)
-
-
 def setup_logging(verbose: bool) -> None:
     """INFO by default (module loggers were previously invisible), DEBUG with -v."""
     logging.basicConfig(
@@ -62,19 +42,17 @@ def setup_logging(verbose: bool) -> None:
 
 def cmd_chat(args: argparse.Namespace) -> None:
     preflight.run(mic=args.mic)
-    if args.legacy:
-        assistant = build_assistant(with_audio=args.mic, quality_stt=args.quality)
-        if args.mic:
-            assistant.run_mic()
-        else:
-            assistant.run_text()
-        return
     from snap.pc import app
 
     if args.mic:
         app.run_mic(quality=args.quality)
     else:
         app.run_text(quality=args.quality)
+
+
+def _bench_emit(sentence: str) -> None:
+    with TIMINGS.stage("tts_console"):
+        print(f"[Snap] {sentence}")
 
 
 def cmd_bench(args: argparse.Namespace) -> None:
@@ -85,19 +63,22 @@ def cmd_bench(args: argparse.Namespace) -> None:
             "[bench] pre-router DISABLED — tool prompts now exercise the LLM "
             "tool-JSON path (schema + feedback loop)\n"
         )
-    assistant = build_assistant(with_audio=False, quality_stt=args.quality)
+
+    from snap.pc.services import SnapLlamaLLM
+
+    llm = SnapLlamaLLM()
     print("Warming up (model load, allocations)...")
-    assistant.turn("Hello.")
+    asyncio.run(llm.respond("Hello.", emit=_bench_emit))
     TIMINGS.clear()
 
     for run in range(args.runs):
         # Fresh conversation per run: a 30-turn session degrades small-model
         # coherence (observed: notes-denial, self-contradiction, emoji slips).
         # Demo reality is short fresh conversations — measure that.
-        assistant.history = assistant.history[:1]
+        llm.reset_conversation()
         for prompt in BENCH_PROMPTS:
             print(f"[bench] run {run + 1}/{args.runs}: {prompt[:48]}")
-            assistant.turn(prompt)
+            asyncio.run(llm.respond(prompt, emit=_bench_emit))
 
     print("\n## Benchmark (medians)\n")
     print(TIMINGS.markdown())
@@ -118,10 +99,9 @@ def main() -> None:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     chat = sub.add_parser("chat", help="talk to Snap")
-    chat.add_argument("--text", action="store_true", help="typed input, no audio (Day-1 spike)")
+    chat.add_argument("--text", action="store_true", help="typed input, no audio")
     chat.add_argument("--mic", action="store_true", help="full pipecat voice pipeline")
     chat.add_argument("--quality", action="store_true", help="Whisper-Large-V3-Turbo (better STT, TTFA ~1.4s)")
-    chat.add_argument("--legacy", action="store_true", help="custom loop, no pipecat (ARM64 fallback)")
     chat.add_argument("-v", "--verbose", action="store_true", help="debug-level logging")
 
     bench = sub.add_parser("bench", help="run the fixed benchmark prompt set")

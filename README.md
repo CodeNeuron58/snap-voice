@@ -17,19 +17,16 @@ Snapdragon® AI Lab Build & Present Challenge 2026.
 uv venv
 uv sync
 
-# 2. models — put a GGUF in data/models/qwen3/ (e.g. qwen3-1.7b-q4_k_m.gguf from Hugging Face);
-#    Whisper downloads automatically on first run.
-#    Silero VAD model is not committed: fetch it once ->
-#      curl -L -o src/snap/assets/models/silero_vad.onnx ^
-#        https://github.com/snakers4/silero-vad/raw/master/src/silero-vad/data/silero_vad.onnx
-#    (or copy it from any machine that has it). Optional: set PIPER_VOICE in src/snap/config.py
-#    to a piper .onnx voice for real audio out (otherwise console fallback).
+# 2. models — put the GGUF in data/models/qwen3-4b-instruct/ (see Troubleshooting if
+#    missing); Whisper auto-downloads on first run; the VAD/turn models ship with pipecat.
+#    Optional: set PIPER_VOICE in src/snap/config.py to a piper .onnx voice for real
+#    audio out (otherwise console fallback).
 # 3. run
-uv run snap chat --text            # typed spike: LLM + tools + sentence streaming (no audio deps)
-uv run snap chat --mic             # FULL pipecat voice pipeline: Silero VAD, STT, LLM, TTS, barge-in
+uv run snap chat --text            # typed: LLM + tools + sentence streaming (no audio deps)
+uv run snap chat --mic             # full voice pipeline: Silero VAD, STT, LLM, TTS, barge-in
 uv run snap chat --mic --quality   # Whisper-Large-V3-Turbo STT (better accuracy, TTFA ~1.4s)
 uv run snap bench                  # fixed 10-prompt set -> per-stage medians -> bench_results.json
-uv run snap chat --legacy --mic    # custom loop without pipecat (the ARM64 fallback path)
+uv run snap bench --no-preroute    # measure the LLM tool-JSON path (pre-router off)
 
 # later, for AI Hub profiling (challenge evidence): uv sync --extra aihub
 ```
@@ -51,23 +48,13 @@ flowchart TB
     TTS --> OUT["Speaker"]
 ```
 
-### Two interchangeable runtimes, one core
+### One runtime; NPU slots in behind the same classes
 
-```mermaid
-flowchart LR
-    subgraph R["Both runtimes wrap the identical turn pipeline above"]
-        direction TB
-        A["pipecat runtime (default)<br/>snap chat --mic / --text<br/>transport, VAD, turn-taking, barge-in"]
-        B["legacy runtime (ARM64 fallback)<br/>snap chat --legacy --mic / --text<br/>dependency-free custom loop"]
-    end
-    A --> C["Shared core:<br/>tool registry - SentenceSegmenter -<br/>Whisper - Qwen3 GGUF - timing/bench"]
-    B --> C
-```
-
-pipecat owns the loop (transport, VAD, turn-taking, interruptions); Snap owns the two NPU-bound
-stages as custom pipecat services plus per-stage latency probes. `snap chat --legacy` runs the
-same models through a dependency-free custom loop — kept as the Windows-ARM64 fallback in case
-pipecat's native deps can't go native-ARM64 on the Snapdragon machine (day-1 wheel check).
+Snap runs on a single runtime: pipecat owns the loop (transport, VAD, turn-taking,
+interruptions); Snap owns the two NPU-bound stages as custom pipecat services plus per-stage
+latency probes. The NPU build swaps the **internals** of those services — QNN w8a16 Whisper via
+ONNX Runtime + QNN EP, GenieX/QAIRT for the LLM — behind the same classes, with no pipeline
+changes (`scripts/profile_on_aihub.py` produces the hosted-device evidence).
 
 **Target hardware:** the Hexagon NPU in Snapdragon X / X2 Elite (the silicon of Snapdragon-powered
 HP OmniBooks, Windows on Snapdragon ARM64). The current CPU spike runs the identical interfaces on
@@ -93,26 +80,21 @@ always the module path — check `pipecat.services.*` in your venv and adjust.
   override in `src/snap/config.py`); check connectivity, or pre-download the model.
 - **"no microphone found" / audio errors** — check Settings → Sound for a working input
   device, or use typed mode: `snap chat --text`.
-- **`silero_vad.onnx` not found** — the VAD model isn't committed; fetch it once (curl in
-  Quickstart step 2).
+- **`silero_vad.onnx` not found** — no longer applicable: the VAD and turn models ship with
+  pipecat's extras; nothing to fetch by hand.
 - **pipecat import errors** — pipecat moves fast; see "Version notes" above. The fix is
   almost always the module path.
 - **llama-cpp-python install is slow or fails** — PyPI has no Windows wheel, so
   `pyproject.toml` pins a prebuilt `win_amd64` wheel; on other platforms uv compiles it
   from source (~30 min, needs CMake + a C++ toolchain).
-- **SmartTurn / turn-detection looks off** — the SmartTurn ONNX auto-downloads (~9 MB);
-  `SNAP_SMART_TURN_URL` overrides the source. If unavailable, Snap falls back to
-  fixed-silence end-of-turn and says so in the log.
 
 ## Repo layout
 
 Modern `src/` layout — the installable package lives in `src/snap/`, runtime data stays at the root.
 
-- `src/snap/pc/` — **the product path**: pipecat services (STT/LLM/TTS), mic pipeline, text spike, TTFA probes
-- `src/snap/pipeline.py` — `--legacy` custom loop (no pipecat; ARM64 fallback), same interfaces
-- `src/snap/tools.py` — the entire agentic surface (deliberately tiny, deterministic, local)
-- `src/snap/stages/` — runtimes used by the legacy loop (CPU now, NPU after the gate)
-- `src/snap/assets/` — package data shipped with the code (bundled Silero VAD ONNX)
+- `src/snap/pc/` — **the product path**: pipecat services (STT/LLM/TTS), mic pipeline, text mode, TTFA probes
+- `src/snap/tools.py` — the entire agentic surface (schema registry, Hermes-style bounded loop, deterministic and local)
+- `src/snap/preflight.py` — boot checks: missing model / no mic exit with the fix, not a traceback
 - `src/snap/timing.py` — per-stage timers; `snap bench` emits the submission benchmark table
 - `docs/` — `benchmarks.md` (methodology + numbers) and `evidence/` (raw AI Hub profiles)
 - `scripts/` — `profile_on_aihub.py` (AI Hub hosted-device profiling harness)
@@ -125,7 +107,7 @@ Strategy, build plan, submission checklist: kept separately in the ZCode workspa
 
 ## Credits
 
-A few small utility modules (sentence segmentation, prosodic turn-end, VAD) are adapted from the
+A small utility module (sentence segmentation with think-block stripping) is adapted from the
 author's earlier MIT open-source project [Yumii](https://github.com/CodeNeuron58/Yumii); everything
 else — the on-device model stack, pipeline, and tooling — was built new for this challenge.
 

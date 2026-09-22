@@ -175,6 +175,10 @@ class SnapLlamaLLM(LLMService):
         if len(self._history) > 12:
             del self._history[:4]
 
+    def reset_conversation(self) -> None:
+        """Drop turn history (bench uses this for fresh-conversation-per-run isolation)."""
+        self._history.clear()
+
     async def warm_up(self) -> None:
         """One 1-token completion so chat-template + compute-graph caches are hot."""
         self._cancel.clear()

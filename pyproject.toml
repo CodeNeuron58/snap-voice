@@ -13,7 +13,7 @@ dependencies = [
     "sounddevice",                         # mic capture + legacy loop playback
     "onnxruntime>=1.17",                   # Silero VAD (bundled ONNX); QNN EP lands here later
     "pipecat-ai[silero,piper]>=0.0.60",    # product voice loop: transport, VAD, interruptions; brings piper-tts
-    "transformers>=4.44",                  # SmartTurn feature extractor (numpy-only path, does NOT pull torch)
+    "transformers>=4.44",                  # feature extractor for pipecat's SmartTurn (does NOT pull torch)
 ]
 
 [project.optional-dependencies]
