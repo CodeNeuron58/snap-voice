@@ -68,9 +68,16 @@ class SnapWhisperSTT(STTService):
         super().__init__(**kwargs)
         from faster_whisper import WhisperModel  # heavy import stays lazy
 
-        self._model = WhisperModel(
-            model_size or config.WHISPER_MODEL, device="cpu", compute_type="int8"
-        )
+        try:
+            self._model = WhisperModel(
+                model_size or config.WHISPER_MODEL, device="cpu", compute_type="int8"
+            )
+        except Exception as exc:  # noqa: BLE001 — download/load failure needs the fix, not a trace
+            raise RuntimeError(
+                f"Whisper '{model_size or config.WHISPER_MODEL}' failed to load: {exc}\n"
+                "It auto-downloads from Hugging Face on first run — check connectivity\n"
+                "(HF_ENDPOINT defaults to the hf-mirror.com mirror; set it to override)."
+            ) from exc
         self._language = config.WHISPER_LANGUAGE
 
     async def run_stt(self, audio: bytes) -> AsyncGenerator[Frame, None]:
@@ -104,12 +111,18 @@ class SnapLlamaLLM(LLMService):
         super().__init__(**kwargs)
         from llama_cpp import Llama  # heavy import stays lazy
 
-        self._llm = Llama(
-            model_path=str(config.LLM_GGUF),
-            n_ctx=config.LLM_N_CTX,
-            n_threads=config.LLM_N_THREADS,
-            verbose=False,
-        )
+        try:
+            self._llm = Llama(
+                model_path=str(config.LLM_GGUF),
+                n_ctx=config.LLM_N_CTX,
+                n_threads=config.LLM_N_THREADS,
+                verbose=False,
+            )
+        except Exception as exc:  # noqa: BLE001 — missing/corrupt GGUF needs the fix, not a trace
+            raise RuntimeError(
+                f"Failed to load GGUF '{config.LLM_GGUF}': {exc}\n"
+                "If it's missing: README 'Quickstart' step 2 (download + placement)."
+            ) from exc
         self._cancel = asyncio.Event()
         self._history: list[dict] = []
 

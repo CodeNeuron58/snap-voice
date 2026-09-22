@@ -10,6 +10,7 @@ Barge-in: `stop_tts` is checked between TTS chunks (use a headset — speaker
 echo can self-trigger; there is no AEC in this loop).
 """
 
+import logging
 import queue
 import threading
 
@@ -18,6 +19,8 @@ import numpy as np
 from snap import config, tools
 from snap.pc.sentence_stream import THINK_BLOCK, SentenceSegmenter
 from snap.timing import TIMINGS
+
+log = logging.getLogger(__name__)
 
 
 class Snap:
@@ -41,8 +44,8 @@ class Snap:
             try:
                 service.warm_up()
             except Exception as exc:  # noqa: BLE001
-                print(f"[warmup] skipped ({exc})")
-        print(f"[warmup] models hot in {_time.perf_counter() - t0:.2f}s")
+                log.warning("warm-up skipped (%s)", exc)
+        log.info("warm-up: models hot in %.2fs", _time.perf_counter() - t0)
 
     # --- one full conversational turn ---------------------------------------
 
@@ -97,13 +100,16 @@ class Snap:
 
         # First-token timing is owned by stream_reply's stage (prefill-inclusive);
         # recording it here too double-counts under the same key.
-        raw = self.llm.stream_reply(messages, on_token=on_token).strip()
-        TIMINGS.record("llm_total", TIMINGS.now_ms() - t0)
-
-        tail = segmenter.flush()
-        if tail and speakable(tail):
-            sentences.put(tail)
-        tts_done.set()
+        try:
+            raw = self.llm.stream_reply(messages, on_token=on_token).strip()
+            TIMINGS.record("llm_total", TIMINGS.now_ms() - t0)
+            tail = segmenter.flush()
+            if tail and speakable(tail):
+                sentences.put(tail)
+        finally:
+            # Must fire even if the LLM raised mid-stream — otherwise tts_worker
+            # spins on its 0.1s poll forever and the thread leaks.
+            tts_done.set()
         speaker.join(timeout=30)
 
         # Think text must not reach routing or history (unterminated <think> from
@@ -137,7 +143,11 @@ class Snap:
                 return
             with TIMINGS.stage("stt_input"):  # placeholder keeps table rows aligned
                 pass
-            self.turn(text)
+            try:
+                self.turn(text)
+            except Exception as exc:  # noqa: BLE001 — one bad turn must not kill the session
+                log.error("turn failed: %s", exc)
+                print("[Snap] Sorry, something went wrong on my side.\n")
 
     # --- mic mode: Silero VAD + SmartTurn end-of-turn (adapted from Yumi) -----
 
@@ -156,7 +166,7 @@ class Snap:
             raise SystemExit(str(exc)) from exc
         turn_detector = get_smart_turn()
         if turn_detector is None:
-            print("[turn] smart-turn unavailable — fixed-silence end-of-turn fallback")
+            log.warning("smart-turn unavailable — fixed-silence end-of-turn fallback")
 
         sr = config_sample_rate()
         block = 512  # Silero v5 wants 512-sample frames @16k (32 ms)
@@ -211,10 +221,14 @@ class Snap:
                 audio = speech_q.get()
                 if audio is None:
                     return
-                text = self.stt.transcribe(audio)
-                if text:
-                    print(f"\nYou: {text}")
-                    self.turn(text)
+                try:
+                    text = self.stt.transcribe(audio)
+                    if text:
+                        print(f"\nYou: {text}")
+                        self.turn(text)
+                except Exception as exc:  # noqa: BLE001 — one bad turn must not kill the mic loop
+                    log.error("turn failed: %s", exc)
+                    print("[Snap] Sorry, something went wrong on my side.\n")
                 print("> ", end="", flush=True)
 
         threading.Thread(target=worker, daemon=True).start()

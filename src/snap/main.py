@@ -10,10 +10,11 @@
 
 import argparse
 import json
+import logging
 import sys
 from pathlib import Path
 
-from snap import config
+from snap import config, preflight
 from snap.timing import TIMINGS
 
 BENCH_PROMPTS = [
@@ -50,7 +51,17 @@ def build_assistant(with_audio: bool, quality_stt: bool = False):
     return Snap(stt=stt, llm=LlamaCppLLM(), tts=tts)
 
 
+def setup_logging(verbose: bool) -> None:
+    """INFO by default (module loggers were previously invisible), DEBUG with -v."""
+    logging.basicConfig(
+        level=logging.DEBUG if verbose else logging.INFO,
+        format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+
 def cmd_chat(args: argparse.Namespace) -> None:
+    preflight.run(mic=args.mic)
     if args.legacy:
         assistant = build_assistant(with_audio=args.mic, quality_stt=args.quality)
         if args.mic:
@@ -67,6 +78,7 @@ def cmd_chat(args: argparse.Namespace) -> None:
 
 
 def cmd_bench(args: argparse.Namespace) -> None:
+    preflight.run(mic=False)
     assistant = build_assistant(with_audio=False, quality_stt=args.quality)
     print("Warming up (model load, allocations)...")
     assistant.turn("Hello.")
@@ -101,12 +113,15 @@ def main() -> None:
     chat.add_argument("--mic", action="store_true", help="full pipecat voice pipeline")
     chat.add_argument("--quality", action="store_true", help="Whisper-Large-V3-Turbo (better STT, TTFA ~1.4s)")
     chat.add_argument("--legacy", action="store_true", help="custom loop, no pipecat (ARM64 fallback)")
+    chat.add_argument("-v", "--verbose", action="store_true", help="debug-level logging")
 
     bench = sub.add_parser("bench", help="run the fixed benchmark prompt set")
     bench.add_argument("--runs", type=int, default=3)
     bench.add_argument("--quality", action="store_true", help="bench with Whisper-Large-V3-Turbo STT")
+    bench.add_argument("-v", "--verbose", action="store_true", help="debug-level logging")
 
     args = parser.parse_args()
+    setup_logging(args.verbose)
     try:
         if args.cmd == "chat":
             cmd_chat(args)

@@ -6,9 +6,12 @@ filterbank setup, chat-template parsing, and compute-graph allocation.
 """
 
 import asyncio
+import logging
 import time
 
 from snap import config
+
+log = logging.getLogger(__name__)
 
 
 async def warm_up(stt=None, llm=None) -> None:
@@ -23,5 +26,5 @@ async def warm_up(stt=None, llm=None) -> None:
                 if asyncio.iscoroutine(result):
                     await result
             except Exception as exc:  # noqa: BLE001 — warm-up must never block boot
-                print(f"[warmup] skipped ({exc})")
-    print(f"[warmup] models hot in {time.perf_counter() - t0:.2f}s")
+                log.warning("warm-up skipped (%s)", exc)
+    log.info("warm-up: models hot in %.2fs", time.perf_counter() - t0)

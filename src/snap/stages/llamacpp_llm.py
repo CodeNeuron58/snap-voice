@@ -16,12 +16,18 @@ class LlamaCppLLM:
     def __init__(self) -> None:
         from llama_cpp import Llama  # heavy import: keep lazy
 
-        self._llm = Llama(
-            model_path=str(config.LLM_GGUF),
-            n_ctx=config.LLM_N_CTX,
-            n_threads=config.LLM_N_THREADS,
-            verbose=False,
-        )
+        try:
+            self._llm = Llama(
+                model_path=str(config.LLM_GGUF),
+                n_ctx=config.LLM_N_CTX,
+                n_threads=config.LLM_N_THREADS,
+                verbose=False,
+            )
+        except Exception as exc:  # noqa: BLE001 — missing/corrupt GGUF needs the fix, not a trace
+            raise RuntimeError(
+                f"Failed to load GGUF '{config.LLM_GGUF}': {exc}\n"
+                "If it's missing: README 'Quickstart' step 2 (download + placement)."
+            ) from exc
 
     def stream_reply(
         self, messages: list[Message], on_token: Callable[[str], None]

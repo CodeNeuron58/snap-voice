@@ -15,9 +15,16 @@ class FasterWhisperSTT:
     def __init__(self, model_size: str | None = None) -> None:
         from faster_whisper import WhisperModel  # heavy import: keep lazy
 
-        self._model = WhisperModel(
-            model_size or config.WHISPER_MODEL, device="cpu", compute_type="int8"
-        )
+        try:
+            self._model = WhisperModel(
+                model_size or config.WHISPER_MODEL, device="cpu", compute_type="int8"
+            )
+        except Exception as exc:  # noqa: BLE001 — download/load failure needs the fix, not a trace
+            raise RuntimeError(
+                f"Whisper '{model_size or config.WHISPER_MODEL}' failed to load: {exc}\n"
+                "It auto-downloads from Hugging Face on first run — check connectivity\n"
+                "(HF_ENDPOINT defaults to the hf-mirror.com mirror; set it to override)."
+            ) from exc
         self._language = config.WHISPER_LANGUAGE
 
     def transcribe(self, pcm_16k: np.ndarray) -> str:
