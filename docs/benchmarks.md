@@ -13,6 +13,12 @@ refreshes `bench_results*.json`; paste new runs here.
 - Per-stage attribution via `snap.timing` (`llm_first_token` = prefill-inclusive
   time to first token, `llm_total` = full reply, `tool_answer_no_llm` = the
   deterministic pre-router path — zero LLM tokens). Medians + p95 reported.
+- **Two-tier tool measurement.** By default the regex pre-router answers
+  arithmetic/conversion prompts deterministically (0 LLM tokens) — those rows
+  measure the *router*, by design. `snap bench --no-preroute` disables it and
+  runs the same prompts through the LLM's Hermes-style tool path (JSON-schema
+  tools, `<tool_call>` protocol, `<tool_response>` feedback, max 2 hops),
+  measuring real model tool adherence and its latency. Report both; never mix.
 - CPU numbers below: dev laptop, Windows x64, Qwen3-4B-Instruct-2507 Q4_K_M via
   llama.cpp. Not the target hardware — the target is Snapdragon NPU.
 

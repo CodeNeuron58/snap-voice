@@ -7,7 +7,21 @@ and must come back as plain text (the callers suppress it from speech).
 import pytest
 
 from snap import config
-from snap.tools import calculate, convert, pre_route, route, search_notes
+from snap.tools import (
+    TOOL_CALL_BLOCK,
+    TOOLS,
+    calculate,
+    convert,
+    dispatch,
+    execute_round,
+    openai_schemas,
+    parse_tool_calls,
+    pre_route,
+    route,
+    schemas_block,
+    search_notes,
+    speakable,
+)
 
 # --- calculate ---------------------------------------------------------------
 
@@ -152,3 +166,106 @@ def test_route_unknown_tool_spoken_error() -> None:
 def test_route_tool_failure_spoken_error() -> None:
     out = route('{"tool": "convert", "args": {"value": 1, "from_unit": "km", "to_unit": "banana"}}')
     assert out.startswith("Sorry, that tool failed:")
+
+
+# --- registry + Hermes-style protocol ------------------------------------------
+
+
+def test_registry_has_all_tools() -> None:
+    assert set(TOOLS) == {"calculate", "convert", "search_notes", "add_note", "get_datetime"}
+
+
+def test_schemas_block_renders_valid_json_schemas() -> None:
+    block = schemas_block()
+    assert "<tools>" in block and "</tools>" in block
+    for name in TOOLS:
+        assert f'"name": "{name}"' in block
+    # every rendered schema must be valid JSON on its own line-group
+    for schema in openai_schemas():
+        assert schema["type"] == "function"
+        assert "parameters" in schema["function"]
+
+
+def test_parse_tool_calls_extracts_tags() -> None:
+    raw = 'Sure. <tool_call>\n{"name": "calculate", "arguments": {"expression": "1+1"}}\n</tool_call>'
+    assert parse_tool_calls(raw) == [("calculate", {"expression": "1+1"})]
+
+
+def test_parse_tool_calls_skips_malformed_and_unterminated() -> None:
+    assert parse_tool_calls('<tool_call>{"name": "calculate", "args": broken</tool_call>') == []
+    assert parse_tool_calls('<tool_call>{"name": "calculate", "arguments": {}}') == []  # unterminated
+    assert parse_tool_calls("no tags here") == []
+
+
+def test_parse_tool_calls_legacy_json_fallback() -> None:
+    raw = '{"tool": "convert", "args": {"value": 5, "from_unit": "km", "to_unit": "mi"}}'
+    assert parse_tool_calls(raw) == [
+        ("convert", {"value": 5, "from_unit": "km", "to_unit": "mi"})
+    ]
+
+
+def test_dispatch_success_and_unknown_tool() -> None:
+    assert dispatch("calculate", {"expression": "2+2"}) == "4.0"
+    err = dispatch("fly", {})
+    assert err.startswith("There was an error when executing the function: fly")
+    assert "calculate" in err  # tells the model which tools exist (recovery)
+
+
+def test_dispatch_handler_error_returns_model_recoverable_message() -> None:
+    err = dispatch("convert", {"value": 1, "from_unit": "km", "to_unit": "banana"})
+    assert "There was an error when executing the function: convert" in err
+    assert "unsupported unit pair" in err
+
+
+def test_execute_round_plain_text_is_none() -> None:
+    assert execute_round("Just a plain answer.") is None
+
+
+def test_execute_round_templated_tool_speaks_fastpath() -> None:
+    raw = '<tool_call>{"name": "calculate", "arguments": {"expression": "2400*0.15"}}</tool_call>'
+    round_ = execute_round(raw)
+    assert round_ is not None
+    assert round_.fastpath == "That's 360."
+    assert round_.tool_messages[0]["role"] == "assistant"
+    assert round_.tool_messages[1]["role"] == "tool"
+    assert "<tool_response>" in round_.tool_messages[1]["content"]
+
+
+def test_execute_round_observation_tool_needs_composition(tmp_path, monkeypatch) -> None:
+    (tmp_path / "n.md").write_text("The water cycle moves water around Earth.", "utf-8")
+    monkeypatch.setattr(config, "NOTES_DIR", tmp_path)
+    raw = '<tool_call>{"name": "search_notes", "arguments": {"query": "water cycle"}}</tool_call>'
+    round_ = execute_round(raw)
+    assert round_ is not None
+    assert round_.fastpath is None  # model composes the spoken answer from the observation
+    assert "water cycle" in round_.tool_messages[1]["content"].lower()
+
+
+def test_execute_round_add_note_writes_file(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(config, "NOTES_DIR", tmp_path)
+    raw = '<tool_call>{"name": "add_note", "arguments": {"content": "Exam is on Friday"}}</tool_call>'
+    round_ = execute_round(raw)
+    assert round_ is not None
+    assert round_.fastpath == "Noted."
+    assert (tmp_path / "memory.md").read_text("utf-8") == "- Exam is on Friday\n"
+    # and the memory is searchable via search_notes (the remember -> recall circle)
+    assert "Exam is on Friday" in search_notes("exam", notes_dir=tmp_path)
+
+
+def test_execute_round_get_datetime_fastpath() -> None:
+    raw = '<tool_call>{"name": "get_datetime", "arguments": {}}</tool_call>'
+    round_ = execute_round(raw)
+    assert round_ is not None
+    assert round_.fastpath.startswith("It's ")
+    assert round_.fastpath.endswith(".")
+
+
+def test_speakable_filters_tags_and_json() -> None:
+    assert speakable("Hello there.") == "Hello there."
+    assert speakable('<tool_call>{"name": "calculate"}</tool_call>') is None
+    assert speakable('{"tool": "calculate"}') is None
+    assert speakable('prefix <tool_call>{"x": 1}</tool_call> tail') == "prefix  tail"
+
+
+def test_tool_call_block_strips_unterminated_tag() -> None:
+    assert TOOL_CALL_BLOCK.sub("", "text <tool_call>{\"x\": 1") == "text "

@@ -6,7 +6,7 @@ stream_reply() signature. Nothing else in the pipeline may care.
 
 from collections.abc import Callable
 
-from snap import config
+from snap import config, tools
 from snap.timing import TIMINGS
 
 Message = dict  # {"role": "...", "content": "..."}
@@ -35,7 +35,10 @@ class LlamaCppLLM:
         chunks: list[str] = []
         with TIMINGS.stage("llm_first_token"):
             stream = self._llm.create_chat_completion(
-                messages=messages, max_tokens=config.LLM_MAX_TOKENS, stream=True
+                messages=messages,
+                tools=tools.openai_schemas(),  # schemas render into Qwen3's trained tool template
+                max_tokens=config.LLM_MAX_TOKENS,
+                stream=True,
             )
             first = next(iter(stream), None)
             if first:

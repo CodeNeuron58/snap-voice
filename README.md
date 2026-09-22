@@ -3,9 +3,9 @@
 [![CI](https://github.com/CodeNeuron58/snap-voice/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeNeuron58/snap-voice/actions/workflows/ci.yml)
 
 **Snap. On-device AI, in a snap.** A fully-offline, NPU-first voice assistant built for
-**Snapdragon-powered HP PCs** (Windows on Snapdragon ARM64, HP OmniBook class): conversation plus a
-small local tool layer (calculate, convert, search your notes), with every heavy stage quantized
-and bound for the Hexagon NPU. Built as an entry for the
+**Snapdragon-powered HP PCs** (Windows on Snapdragon ARM64, HP OmniBook class): conversation plus
+a small local tool layer (calculate, convert, remember & search notes, date & time), with every
+heavy stage quantized and bound for the Hexagon NPU. Built as an entry for the
 Snapdragon® AI Lab Build & Present Challenge 2026.
 
 > Independent open-source project. Not affiliated with Snap Inc. or Qualcomm.
@@ -40,8 +40,10 @@ uv run snap chat --legacy --mic    # custom loop without pipecat (the ARM64 fall
 mic ──> pipecat LocalAudioTransport + Silero VAD (interruptions handled by the framework)
     ──> SnapWhisperSTT      faster-whisper small int8 (CPU spike) → QNN w8a16 on NPU (AI Hub compile)
     ──> SnapLlamaLLM        Qwen3-1.7B GGUF via llama.cpp (CPU spike) → GenieX/QAIRT on NPU
-    │         └─ tool JSON? → local router: calculate / convert / search_notes
-    │           (result spoken from a template — no second LLM pass, JSON never spoken raw)
+    │         └─ <tool_call>? → schema-driven local tools: calculate / convert /
+    │            notes search + memory / date-time (Hermes-style protocol, bounded
+    │            loop; deterministic tools answer from templates with NO second LLM
+    │            pass — tags and JSON are never spoken raw)
     ──> piper TTS (CPU, chunked) ──> speaker
          └─ TranscriptionMark / FirstAudioMeasure probes record TTFA into the benchmark table
 ```

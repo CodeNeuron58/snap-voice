@@ -185,45 +185,19 @@ class SnapLlamaLLM(LLMService):
 
     def _generate(self, messages: list[dict]):
         stream = self._llm.create_chat_completion(
-            messages=messages, max_tokens=config.LLM_MAX_TOKENS, stream=True
+            messages=messages,
+            tools=tools.openai_schemas(),  # schemas render into Qwen3's trained tool template
+            max_tokens=config.LLM_MAX_TOKENS,
+            stream=True,
         )
         for part in stream:
             if self._cancel.is_set():
                 break
             yield part["choices"][0]["delta"].get("content") or ""
 
-    async def respond(self, user_text: str, emit: Callable[[str], object]) -> str:
-        """One full turn: stream tokens, emit sentences, route tool JSON. Returns reply.
-
-        `emit` may be sync (text mode) or async (pipeline); normalized here.
-        The segmenter is the single gatekeeper of what's speakable: think blocks
-        are stripped by it, and JSON-looking chunks are dropped at emit time —
-        tool calls can arrive after a <think> block, so first-token sniffing
-        is not reliable. Think text is also stripped from raw before history.
-        """
-        if not asyncio.iscoroutinefunction(emit):
-            sync_emit = emit
-
-            async def emit(sentence: str) -> None:  # noqa: F811 — normalized wrapper
-                sync_emit(sentence)
-
-        async def emit_speakable(sentence: str) -> None:
-            if sentence.lstrip().startswith("{") or '{"tool"' in sentence:
-                return  # raw tool JSON never reaches speech; router speaks the result
-            await emit(sentence)
-
-        t0 = time.perf_counter()
-        # Deterministic answers never touch the LLM: instant, hallucination-free.
-        pre = tools.pre_route(user_text)
-        if pre is not None:
-            TIMINGS.record("tool_answer_no_llm", (time.perf_counter() - t0) * 1000)
-            await emit(pre)
-            self._remember(user_text, pre)
-            return pre
-
-        self._cancel.clear()
-        messages = self._messages_for(user_text)
-
+    async def _stream_pass(self, messages: list[dict], t0: float, emit, record_first_token: bool) -> str:
+        """One streaming generation pass: speak sentences as their boundaries close,
+        return the raw text. Tool-call tags and JSON are suppressed at emit time."""
         queue: asyncio.Queue = asyncio.Queue()
         loop = asyncio.get_running_loop()
 
@@ -238,7 +212,7 @@ class SnapLlamaLLM(LLMService):
 
         collected: list[str] = []
         segmenter = SentenceSegmenter()
-        first_token_done = False
+        first_token_done = not record_first_token
 
         while True:
             token = await queue.get()
@@ -249,19 +223,66 @@ class SnapLlamaLLM(LLMService):
                 first_token_done = True
             collected.append(token)
             for sentence in segmenter.feed(token):
-                await emit_speakable(sentence)
-        TIMINGS.record("llm_total", (time.perf_counter() - t0) * 1000)
-
+                cleaned = tools.speakable(sentence)
+                if cleaned:
+                    await emit(cleaned)
         tail = segmenter.flush()
         if tail:
-            await emit_speakable(tail)
+            cleaned = tools.speakable(tail)
+            if cleaned:
+                await emit(cleaned)
+        return "".join(collected)
 
-        # Think text must not reach routing or history: an unterminated <think>
-        # (token budget exhausted mid-thought) otherwise becomes the "reply".
-        raw = THINK_BLOCK.sub("", "".join(collected), count=1).strip()
-        reply = tools.route(raw) if raw else "…"
-        if reply and reply != raw:  # tool path: templated result, no second LLM pass
-            await emit(reply)
+    async def respond(self, user_text: str, emit: Callable[[str], object]) -> str:
+        """One full turn: bounded Hermes-style tool loop with streaming output.
+
+        Pass 1 streams sentences (TTFA-critical). If the model emitted tool calls:
+        templated tools speak instantly (fastpath, no second pass); observation-only
+        tools feed <tool_response> back and the next pass composes the spoken answer.
+        Hard-capped at config.MAX_TOOL_HOPS — OpenClaw-style runaway-loop protection.
+        """
+        if not asyncio.iscoroutinefunction(emit):
+            sync_emit = emit
+
+            async def emit(sentence: str) -> None:  # noqa: F811 — normalized wrapper
+                sync_emit(sentence)
+
+        t0 = time.perf_counter()
+        # Deterministic answers never touch the LLM: instant, hallucination-free.
+        pre = tools.pre_route(user_text)
+        if pre is not None:
+            TIMINGS.record("tool_answer_no_llm", (time.perf_counter() - t0) * 1000)
+            await emit(pre)
+            self._remember(user_text, pre)
+            return pre
+
+        self._cancel.clear()
+        messages = self._messages_for(user_text)
+
+        hop = 0
+        while True:
+            raw = (
+                await self._stream_pass(messages, t0, emit, record_first_token=(hop == 0))
+            ).strip()
+            TIMINGS.record("llm_total", (time.perf_counter() - t0) * 1000)
+            raw = THINK_BLOCK.sub("", raw, count=1).strip()
+
+            round_ = tools.execute_round(raw)
+            if round_ is None:
+                reply = tools.route(raw) if raw else "…"
+                if reply != raw:  # legacy {'say': …} / JSON drift → router speaks it
+                    await emit(reply)
+                break
+            if round_.fastpath is not None:
+                reply = round_.fastpath
+                await emit(reply)
+                break
+            if hop >= config.MAX_TOOL_HOPS:
+                reply = "Sorry, I couldn't finish that."
+                await emit(reply)
+                break
+            messages = messages + round_.tool_messages
+            hop += 1
 
         self._remember(user_text, reply)
         if config.PRINT_TURN_REPORT:

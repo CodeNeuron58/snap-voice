@@ -79,6 +79,12 @@ def cmd_chat(args: argparse.Namespace) -> None:
 
 def cmd_bench(args: argparse.Namespace) -> None:
     preflight.run(mic=False)
+    if args.no_preroute:
+        config.PRE_ROUTE_ENABLED = False
+        print(
+            "[bench] pre-router DISABLED — tool prompts now exercise the LLM "
+            "tool-JSON path (schema + feedback loop)\n"
+        )
     assistant = build_assistant(with_audio=False, quality_stt=args.quality)
     print("Warming up (model load, allocations)...")
     assistant.turn("Hello.")
@@ -95,7 +101,10 @@ def cmd_bench(args: argparse.Namespace) -> None:
 
     print("\n## Benchmark (medians)\n")
     print(TIMINGS.markdown())
-    out = Path(f"bench_results{'_quality' if args.quality else ''}.json")
+    out = Path(
+        f"bench_results{'_quality' if args.quality else ''}"
+        f"{'_no-preroute' if args.no_preroute else ''}.json"
+    )
     out.write_text(json.dumps(TIMINGS.summary(), indent=2), encoding="utf-8")
     print(f"\nSaved -> {out.resolve()}")
     print(
@@ -118,6 +127,11 @@ def main() -> None:
     bench = sub.add_parser("bench", help="run the fixed benchmark prompt set")
     bench.add_argument("--runs", type=int, default=3)
     bench.add_argument("--quality", action="store_true", help="bench with Whisper-Large-V3-Turbo STT")
+    bench.add_argument(
+        "--no-preroute",
+        action="store_true",
+        help="disable the deterministic pre-router — tool prompts exercise the LLM tool-JSON path",
+    )
     bench.add_argument("-v", "--verbose", action="store_true", help="debug-level logging")
 
     args = parser.parse_args()

@@ -53,3 +53,8 @@ VAD_STOP_SECS = 0.45
 # Latency hygiene
 WARM_UP_ON_BOOT = True             # dummy Whisper pass + 1-token LLM completion at startup
 PRINT_TURN_REPORT = True           # per-turn Deepgram-style latency attribution line
+
+# Agentic loop (Hermes-style <tool_call> protocol; OpenClaw-style bounded ReAct)
+MAX_TOOL_HOPS = 2                  # hard cap on tool round-trips per turn — no runaway loops
+PRE_ROUTE_ENABLED = True           # regex pre-router answers math/convert before the LLM
+                                   # (bench --no-preroute disables it to measure the LLM path)

@@ -66,8 +66,6 @@ class Snap:
         messages = self.history + [{"role": "user", "content": user_text}]
 
         stop_tts = threading.Event()
-        sentences: queue.Queue[str] = queue.Queue()
-        tts_done = threading.Event()
 
         def tts_worker() -> None:
             while True:
@@ -83,41 +81,61 @@ class Snap:
                         sentences.get_nowait()
                     return
 
-        speaker = threading.Thread(target=tts_worker, daemon=True)
-        speaker.start()
-
         collected: list[str] = []
         segmenter = SentenceSegmenter()
-
-        def speakable(sentence: str) -> bool:
-            return not sentence.lstrip().startswith("{")  # raw JSON never reaches speech
 
         def on_token(token: str) -> None:
             collected.append(token)
             for sentence in segmenter.feed(token):
-                if speakable(sentence):
-                    sentences.put(sentence)
+                cleaned = tools.speakable(sentence)  # tool tags/JSON never reach speech
+                if cleaned:
+                    sentences.put(cleaned)
 
-        # First-token timing is owned by stream_reply's stage (prefill-inclusive);
-        # recording it here too double-counts under the same key.
-        try:
-            raw = self.llm.stream_reply(messages, on_token=on_token).strip()
-            TIMINGS.record("llm_total", TIMINGS.now_ms() - t0)
-            tail = segmenter.flush()
-            if tail and speakable(tail):
-                sentences.put(tail)
-        finally:
-            # Must fire even if the LLM raised mid-stream — otherwise tts_worker
-            # spins on its 0.1s poll forever and the thread leaks.
-            tts_done.set()
-        speaker.join(timeout=30)
+        # Bounded Hermes-style tool loop: templated tools speak instantly (fastpath,
+        # no second pass); observation tools feed <tool_response> back and the next
+        # pass composes the spoken answer. Hard-capped at config.MAX_TOOL_HOPS.
+        hop = 0
+        while True:
+            sentences: queue.Queue[str] = queue.Queue()
+            tts_done = threading.Event()
 
-        # Think text must not reach routing or history (unterminated <think> from
-        # token-budget exhaustion would otherwise become the "reply").
-        raw = THINK_BLOCK.sub("", raw, count=1).strip()
-        reply = tools.route(raw) if raw else "…"
-        if reply and reply != raw:  # tool path: speak the templated result now
-            self.tts.speak(reply, stop_tts)
+            speaker = threading.Thread(target=tts_worker, daemon=True)
+            speaker.start()
+
+            try:
+                raw = self.llm.stream_reply(messages, on_token=on_token).strip()
+                TIMINGS.record("llm_total", TIMINGS.now_ms() - t0)
+                tail = segmenter.flush()
+                cleaned = tools.speakable(tail) if tail else None
+                if cleaned:
+                    sentences.put(cleaned)
+            finally:
+                # Must fire even if the LLM raised mid-stream — otherwise tts_worker
+                # spins on its 0.1s poll forever and the thread leaks.
+                tts_done.set()
+            speaker.join(timeout=30)
+
+            # Think text must not reach routing or history (unterminated <think> from
+            # token-budget exhaustion would otherwise become the "reply").
+            raw = THINK_BLOCK.sub("", raw, count=1).strip()
+            round_ = tools.execute_round(raw)
+            if round_ is None:
+                reply = tools.route(raw) if raw else "…"
+                if reply and reply != raw:  # say-JSON / tool drift: speak the routed result
+                    self.tts.speak(reply, stop_tts)
+                break
+            if round_.fastpath is not None:
+                reply = round_.fastpath
+                self.tts.speak(reply, stop_tts)
+                break
+            if hop >= config.MAX_TOOL_HOPS:
+                reply = "Sorry, I couldn't finish that."
+                self.tts.speak(reply, stop_tts)
+                break
+            messages = messages + round_.tool_messages
+            collected.clear()
+            segmenter = SentenceSegmenter()
+            hop += 1
 
         self.history += [
             {"role": "user", "content": user_text},
