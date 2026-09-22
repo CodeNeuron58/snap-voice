@@ -99,7 +99,7 @@ def cmd_bench(args: argparse.Namespace) -> None:
     out.write_text(json.dumps(TIMINGS.summary(), indent=2), encoding="utf-8")
     print(f"\nSaved -> {out.resolve()}")
     print(
-        "Next: paste the table into docs/deck-and-video-script.md; "
+        "Next: paste the table into docs/benchmarks.md; "
         "fill the NPU column after AI Hub profiling (scripts/profile_on_aihub.py)."
     )
 

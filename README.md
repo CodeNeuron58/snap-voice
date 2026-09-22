@@ -57,6 +57,28 @@ Coded against recent pipecat docs: `pipecat.transports.local.audio.LocalAudioTra
 `snap/pc/services.py`). If an import fails on your installed version, the fix is almost
 always the module path — check `pipecat.services.*` in your venv and adjust.
 
+## Troubleshooting
+
+- **"LLM model file not found"** — `data/models/` is gitignored, so a fresh clone has no
+  models. Download `qwen3-4b-instruct-2507-q4_k_m.gguf` (Qwen/Qwen3-4B-Instruct-2507-GGUF,
+  the Q4_K_M quant) into `data/models/qwen3-4b-instruct/`, or uncomment the 1.7B fallback
+  line (`LLM_GGUF`) in `src/snap/config.py`. Details: Quickstart step 2.
+- **"Whisper ... failed to load"** — Whisper auto-downloads from Hugging Face on first run.
+  All HF traffic is routed via the `hf-mirror.com` mirror by default (`HF_ENDPOINT`
+  override in `src/snap/config.py`); check connectivity, or pre-download the model.
+- **"no microphone found" / audio errors** — check Settings → Sound for a working input
+  device, or use typed mode: `snap chat --text`.
+- **`silero_vad.onnx` not found** — the VAD model isn't committed; fetch it once (curl in
+  Quickstart step 2).
+- **pipecat import errors** — pipecat moves fast; see "Version notes" above. The fix is
+  almost always the module path.
+- **llama-cpp-python install is slow or fails** — PyPI has no Windows wheel, so
+  `pyproject.toml` pins a prebuilt `win_amd64` wheel; on other platforms uv compiles it
+  from source (~30 min, needs CMake + a C++ toolchain).
+- **SmartTurn / turn-detection looks off** — the SmartTurn ONNX auto-downloads (~9 MB);
+  `SNAP_SMART_TURN_URL` overrides the source. If unavailable, Snap falls back to
+  fixed-silence end-of-turn and says so in the log.
+
 ## Repo layout
 
 Modern `src/` layout — the installable package lives in `src/snap/`, runtime data stays at the root.
@@ -67,6 +89,8 @@ Modern `src/` layout — the installable package lives in `src/snap/`, runtime d
 - `src/snap/stages/` — runtimes used by the legacy loop (CPU now, NPU after the gate)
 - `src/snap/assets/` — package data shipped with the code (bundled Silero VAD ONNX)
 - `src/snap/timing.py` — per-stage timers; `snap bench` emits the submission benchmark table
+- `docs/` — `benchmarks.md` (methodology + numbers) and `evidence/` (raw AI Hub profiles)
+- `scripts/` — `profile_on_aihub.py` (AI Hub hosted-device profiling harness)
 - `data/` — runtime-only (gitignored models, sample notes) — never published
 
 ## Challenge docs
