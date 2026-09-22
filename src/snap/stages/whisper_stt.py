@@ -6,6 +6,7 @@ ONNX Runtime + QNN Execution Provider. The pipeline must not change.
 """
 
 import numpy as np
+
 from snap import config
 from snap.timing import TIMINGS
 

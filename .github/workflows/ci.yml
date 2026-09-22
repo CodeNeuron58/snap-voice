@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff==0.16.8
+      - run: ruff check .
+
+  test:
+    name: Tests (pure logic, no heavy deps)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # No `uv sync` here on purpose: llama-cpp-python is pinned to a win_amd64
+      # wheel, so a full install is impossible on Linux. The test suite covers
+      # pure logic (segmenter, tools, timing) and imports none of the heavy
+      # runtime deps — [tool.pytest.ini_options].pythonpath exposes src/.
+      - run: pip install pytest==9.1.1
+      - run: pytest
+
+  install-smoke:
+    name: Install smoke (Windows, full deps)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      # The real quickstart path: full locked install, then verify the CLI and
+      # the pipecat integration import cleanly (the drift-prone spot — see
+      # README "Version notes").
+      - run: uv sync
+      - run: uv run snap --help
+      - run: uv run python -c "from snap.pc import app"

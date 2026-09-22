@@ -17,12 +17,6 @@ from collections.abc import AsyncGenerator, Callable
 from datetime import datetime, timezone
 
 import numpy as np
-
-from snap import config, tools
-from snap.pc.sentence_stream import THINK_BLOCK, SentenceSegmenter
-from snap.timing import TIMINGS
-
-
 from pipecat.frames.frames import (
     Frame,
     InterruptionFrame,
@@ -30,12 +24,15 @@ from pipecat.frames.frames import (
     LLMFullResponseEndFrame,
     LLMFullResponseStartFrame,
     LLMTextFrame,
-    TextFrame,
     TranscriptionFrame,
 )
 from pipecat.services.llm_service import LLMService
 from pipecat.services.stt_service import STTService
 from pipecat.services.tts_service import TTSService
+
+from snap import config, tools
+from snap.pc.sentence_stream import THINK_BLOCK, SentenceSegmenter
+from snap.timing import TIMINGS
 
 # pipecat 1.x renamed OpenAILLMContext -> LLMContext; keep a single import surface.
 try:  # newer pipecat

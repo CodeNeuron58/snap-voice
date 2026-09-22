@@ -6,8 +6,8 @@ CPU and NPU runtimes swap without touching the pipeline:
     TTS:       speak(text, stop) -> None  (blocking; must check `stop` frequently)
 """
 
-from snap.stages.whisper_stt import FasterWhisperSTT
 from snap.stages.llamacpp_llm import LlamaCppLLM
 from snap.stages.tts import ConsoleTTS, PiperTTS
+from snap.stages.whisper_stt import FasterWhisperSTT
 
 __all__ = ["FasterWhisperSTT", "LlamaCppLLM", "ConsoleTTS", "PiperTTS"]

@@ -9,6 +9,7 @@ Design constraints:
 import ast
 import json
 import operator
+import re
 from pathlib import Path
 
 from snap import config
@@ -94,8 +95,6 @@ def search_notes(query: str, notes_dir: Path | None = None) -> str:
 # adherence is weak — so math and unit conversions never reach the LLM at all.
 # A regex pre-router catches the deterministic cases, computes locally, and the
 # LLM handles everything else. Zero tokens, zero hallucination, ~0ms answers.
-
-import re
 
 _NUM = r"[\d,]+(?:\.\d+)?"
 _UNIT = r"km|mi|miles?|kg|kilos?|pounds?|lbs?|celsius|fahrenheit"

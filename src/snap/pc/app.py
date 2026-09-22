@@ -49,7 +49,10 @@ async def _mic_pipeline(quality: bool) -> None:
     from pipecat.pipeline.pipeline import Pipeline
     from pipecat.pipeline.runner import PipelineRunner
     from pipecat.pipeline.task import PipelineParams, PipelineTask
-    from pipecat.transports.local.audio import LocalAudioTransport, LocalAudioTransportParams
+    from pipecat.transports.local.audio import (
+        LocalAudioTransport,
+        LocalAudioTransportParams,
+    )
 
     from snap.pc.latency import FirstAudioMeasure, TranscriptionMark
     from snap.pc.services import Context, SnapLlamaLLM, SnapWhisperSTT, build_tts

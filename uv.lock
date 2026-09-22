@@ -3491,8 +3491,8 @@ provides-extras = ["aihub"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pytest" },
-    { name = "ruff" },
+    { name = "pytest", specifier = "==9.1.1" },
+    { name = "ruff", specifier = "==0.16.8" },
 ]
 
 [[package]]

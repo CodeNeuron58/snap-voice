@@ -1,5 +1,7 @@
 # Snap
 
+[![CI](https://github.com/CodeNeuron58/snap-voice/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeNeuron58/snap-voice/actions/workflows/ci.yml)
+
 **Snap. On-device AI, in a snap.** A fully-offline, NPU-first voice assistant — conversation plus a
 small local tool layer (calculate, convert, search your notes). Built as an entry for the
 Snapdragon® AI Lab Build & Present Challenge 2026.
@@ -79,6 +81,14 @@ Strategy, build plan, submission checklist: kept separately in the ZCode workspa
 - `snap/turn.py` — Smart Turn v3 (pipecat-ai ONNX, ~9 MB): prosodic end-of-turn for `--legacy --mic`.
 - `snap/vad.py` + `snap/assets/models/silero_vad.onnx` — torch-free Silero v5 VAD; keeps the legacy
   fallback path native-ARM64-capable (onnxruntime wheels exist where torch's may not).
+
+## Development
+
+```bash
+uv sync               # full env incl. dev tools (ruff, pytest)
+uv run pytest         # unit tests — pure logic only, no models or audio deps needed
+uv run ruff check .   # lint (CI gates on this)
+```
 
 ## License
 
