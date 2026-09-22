@@ -1,7 +1,6 @@
 """Smart Turn v3 (pipecat-ai, BSD-2-Clause): end-of-turn detection from raw audio.
 
-Adapted from the author's project Yumi (src/yumii/audio/smart_turn.py, MIT):
-a Whisper-tiny backbone (~8M params, int8 ONNX, ~9 MB) with a linear classifier
+A Whisper-tiny backbone (~8M params, int8 ONNX, ~9 MB) with a linear classifier
 that decides whether the user finished their thought — using prosody, not just
 silence. Runs alongside VAD: when VAD reports a brief silence, the whole user
 turn is fed to the model; "incomplete" keeps listening (the user paused

@@ -41,7 +41,7 @@ SILENCE_END_OF_TURN_MS = 700
 MAX_UTTERANCE_MS = 12_000
 SAMPLE_RATE = 16_000
 
-# Mic mode (Silero VAD + SmartTurn, adapted from Yumi)
+# Mic mode (Silero VAD + SmartTurn)
 VAD_SPEECH_THRESHOLD = 0.5         # Silero speech probability gate
 SMART_TURN_ENABLED = True          # prosodic end-of-turn; auto-disables if models/deps missing
 SMART_TURN_CHECK_SILENCE_MS = 250  # Deepgram-style aggressive: first check after 250ms of silence

@@ -1,7 +1,6 @@
 """Turn a raw LLM token stream into speakable sentences, thinking-blocks stripped.
 
-Adapted from the author's project Yumi (src/yumii/tts/sentence_stream.py, MIT):
-adds Hindi Danda (।) as a sentence boundary so Hindi replies segment too.
+Adds Hindi Danda (।) as a sentence boundary so Hindi replies segment too.
 
 Critical for Snap because Qwen3 is a thinking model: ``<think>…</think>`` blocks
 must never reach speech — including one left unterminated at stream end. A

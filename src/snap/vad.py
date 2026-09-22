@@ -1,4 +1,4 @@
-"""Silero VAD v5 on onnxruntime (no torch) — adapted from Yumi (MIT, same author).
+"""Silero VAD v5 on onnxruntime (no torch).
 
 The model is bundled in snap/assets/models/silero_vad.onnx (~2 MB), stateful
 (an RNN); reset_states() zeroes it before each capture. This is the VAD for the

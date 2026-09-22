@@ -149,7 +149,7 @@ class Snap:
                 log.error("turn failed: %s", exc)
                 print("[Snap] Sorry, something went wrong on my side.\n")
 
-    # --- mic mode: Silero VAD + SmartTurn end-of-turn (adapted from Yumi) -----
+    # --- mic mode: Silero VAD + SmartTurn end-of-turn -------------------------
 
     def run_mic(self) -> None:  # pragma: no cover — hardware loop, exercised manually
         """Capture with a real VAD; SmartTurn (prosody) decides end-of-turn, not just
