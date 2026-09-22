@@ -105,35 +105,11 @@ Modern `src/` layout — the installable package lives in `src/snap/`, runtime d
 Strategy, build plan, submission checklist: kept separately in the ZCode workspace under
 `snapdragon-challenge/` (`C:\Users\bipra\.zcode\workspace\default\snapdragon-challenge`).
 
-## Provenance (predecessor + what changed)
+## Credits
 
-Snap is the author's own work. It is a significant rework of the author's earlier MIT
-open-source project **[Yumii](https://github.com/CodeNeuron58/Yumii)** (a FastAPI/LangGraph
-cloud voice agent), rebuilt for this challenge around on-device AI models from open-source
-platforms — the engine itself was **not** forked (it was too FastAPI/LangGraph-coupled for an
-NPU-first, offline target).
-
-**Carried over from Yumii** — three small, same-author MIT modules, each adapted:
-
-- `snap/pc/sentence_stream.py` — SentenceSegmenter: token→sentence streaming with
-  `<think>`-block stripping (Qwen3 thinks out loud otherwise) + clause-boundary flush;
-  Hindi Danda added for Snap.
-- `snap/turn.py` — Smart Turn v3 (pipecat-ai ONNX, ~9 MB): prosodic end-of-turn for
-  `--legacy --mic`.
-- `snap/vad.py` + `snap/assets/models/silero_vad.onnx` — torch-free Silero v5 VAD; keeps the
-  legacy fallback path native-ARM64-capable (onnxruntime wheels exist where torch's may not).
-
-**Built new for Snap** — the significant modification (the entire on-device model stack and
-pipeline):
-
-- STT: faster-whisper small / large-v3-turbo (CPU today) → QNN w8a16 on Hexagon NPU via
-  Qualcomm AI Hub compile; LLM: Qwen3-4B-Instruct-2507 GGUF via llama.cpp → GenieX/QAIRT on NPU.
-- The pipecat voice pipeline (Silero VAD, turn-taking, barge-in) with custom STT/LLM services
-  plus a dependency-free legacy fallback loop.
-- The deterministic local tool layer (calculate / convert / notes search) with a strict JSON
-  protocol — results spoken from templates, no second LLM pass.
-- Per-stage latency instrumentation, benchmark harness (`snap bench`), boot preflight,
-  unit tests, and CI.
+A few small utility modules (sentence segmentation, prosodic turn-end, VAD) are adapted from the
+author's earlier MIT open-source project [Yumii](https://github.com/CodeNeuron58/Yumii); everything
+else — the on-device model stack, pipeline, and tooling — was built new for this challenge.
 
 ## Development
 
