@@ -205,16 +205,26 @@ def test_parse_tool_calls_legacy_json_fallback() -> None:
 
 
 def test_dispatch_success_and_unknown_tool() -> None:
-    assert dispatch("calculate", {"expression": "2+2"}) == "4.0"
-    err = dispatch("fly", {})
+    assert dispatch("calculate", {"expression": "2+2"}) == (True, "4.0")
+    ok, err = dispatch("fly", {})
+    assert not ok
     assert err.startswith("There was an error when executing the function: fly")
     assert "calculate" in err  # tells the model which tools exist (recovery)
 
 
 def test_dispatch_handler_error_returns_model_recoverable_message() -> None:
-    err = dispatch("convert", {"value": 1, "from_unit": "km", "to_unit": "banana"})
+    ok, err = dispatch("convert", {"value": 1, "from_unit": "km", "to_unit": "banana"})
+    assert not ok
     assert "There was an error when executing the function: convert" in err
     assert "unsupported unit pair" in err
+
+
+def test_execute_round_failed_tool_feeds_error_back_not_fastpath() -> None:
+    raw = '<tool_call>{"name": "calculate", "arguments": {"expression": "15% of 2400"}}</tool_call>'
+    round_ = execute_round(raw)
+    assert round_ is not None
+    assert round_.fastpath is None  # model must see the error and correct itself
+    assert "error" in round_.tool_messages[1]["content"].lower()
 
 
 def test_execute_round_plain_text_is_none() -> None:

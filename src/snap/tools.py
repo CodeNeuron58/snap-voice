@@ -248,19 +248,19 @@ def parse_tool_calls(text: str) -> list[tuple[str, dict]]:
     return calls
 
 
-def dispatch(name: str, args: dict) -> str:
-    """Execute one tool and return the OBSERVATION string. Never raises: failures
-    come back as a Hermes-style error so the model can correct and retry."""
+def dispatch(name: str, args: dict) -> tuple[bool, str]:
+    """Execute one tool. Returns (ok, observation). Never raises: failures come back
+    as a Hermes-style error string so the model can correct the call and retry."""
     tool = TOOLS.get(name)
     if tool is None:
-        return (
+        return False, (
             f"There was an error when executing the function: {name} is not an "
             "available tool. Available tools: " + ", ".join(TOOLS) + "."
         )
     try:
-        return tool.handler(args)
+        return True, tool.handler(args)
     except Exception as exc:  # noqa: BLE001 — the model sees the error, the user never does
-        return (
+        return False, (
             f"There was an error when executing the function: {name}\n{exc}\n"
             "Please correct the arguments and try again."
         )
@@ -289,14 +289,17 @@ def execute_round(raw: str) -> ToolRound | None:
     last_result = ""
     last_tool: Tool | None = None
     last_args: dict = {}
+    ok = False
     for name, args in calls:
-        observation = dispatch(name, args)
+        ok, observation = dispatch(name, args)
         tool_messages.append(
             {"role": "tool", "content": f"<tool_response>\n{observation}\n</tool_response>"}
         )
         last_result, last_tool, last_args = observation, TOOLS.get(name), args
     fastpath = None
-    if last_tool is not None and last_tool.speak is not None:
+    # Fastpath only on SUCCESS: a failed call must go back to the model so it can
+    # correct itself (Hermes recovery); speaking the error string would be nonsense.
+    if ok and last_tool is not None and last_tool.speak is not None:
         if last_tool.name == "convert":
             fastpath = _convert_speak(last_args, last_result)
         else:

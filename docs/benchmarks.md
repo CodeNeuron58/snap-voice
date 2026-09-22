@@ -22,15 +22,35 @@ refreshes `bench_results*.json`; paste new runs here.
 - CPU numbers below: dev laptop, Windows x64, Qwen3-4B-Instruct-2507 Q4_K_M via
   llama.cpp. Not the target hardware — the target is Snapdragon NPU.
 
-## Measured (CPU baseline, 2026-09-21)
+## Measured — tier 1: default (deterministic pre-router ON), 2026-09-22
 
 | Stage | n | median | p95 | Source |
 |---|---|---|---|---|
-| LLM first token (prefill-inclusive) | 18 | 2,785 ms | 18,651 ms | `snap bench` (measured) |
-| LLM full reply (~100–150 tok) | 18 | 10,708 ms | 22,762 ms | `snap bench` (measured) |
-| Tool answers (pre-routed, no LLM) | 12 | 0.1 ms | 1.2 ms | `snap bench` (measured) |
+| LLM first token (prefill-inclusive) | 21 | 3,004 ms | 16,898 ms | `snap bench` (measured) |
+| LLM full reply (~100–150 tok) | 21 | 10,896 ms | 22,869 ms | `snap bench` (measured) |
+| Tool answers (pre-routed, no LLM) | 12 | 0.1 ms | 1.3 ms | `snap bench` (measured) |
 | STT (3 s utterance) | — | — | — | not in text bench |
 | TTFA (end-to-end voice) | — | — | — | pending mic-path probe |
+
+## Measured — tier 2: LLM tool path (`snap bench --no-preroute`), 2026-09-22
+
+The same 10 prompts with the pre-router disabled — every prompt flows through the
+LLM's Hermes-style tool path (schemas → `<tool_call>` → observation → compose).
+
+| Stage | n | median | p95 | Source |
+|---|---|---|---|---|
+| LLM first token | 35 | 1,537 ms | 17,746 ms | `snap bench --no-preroute` (measured) |
+| LLM full reply | 35 | 9,815 ms | 26,220 ms | `snap bench --no-preroute` (measured) |
+
+**Tool adherence findings (honest):** all 12 tool prompts (math/convert) eventually
+answered correctly, 0 hard failures. Several first attempts were imperfect — a
+string-typed argument or an unparseable expression — and were **recovered by the
+error-feedback loop**: the Hermes-style `<tool_response>` error went back to the
+model, which corrected the call on the next pass. The model also sometimes narrates
+("I'll convert 12 kg to pounds") or composes the answer instead of using the
+template. This variance is exactly why tier 1 exists: the deterministic pre-router
+answers math/convert in 0.1 ms with 100% reliability, and the LLM path handles
+everything else.
 
 ## Profiled (Snapdragon NPU — AI Hub, X2 Elite CRD)
 
