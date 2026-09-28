@@ -80,9 +80,10 @@ AI Hub profiling: [scripts/profile_on_aihub.py](scripts/profile_on_aihub.py) →
 
 ## Benchmarks
 
-CPU medians on the dev laptop (x64, `snap bench`, fresh-session runs). NPU figures are
-Qualcomm AI Hub published numbers for X2 Elite — to be confirmed by our own profile jobs.
-Full two-tier methodology: [docs/benchmarks.md](docs/benchmarks.md).
+CPU medians on the dev laptop (x64, `snap bench`, fresh-session runs). STT NPU
+figures are **our own AI Hub profile jobs** (X2 Elite CRD); LLM figures are
+Qualcomm AI Hub published — own LLM profile job pending. Full two-tier
+methodology: [docs/benchmarks.md](docs/benchmarks.md).
 
 | Stage | CPU (measured) | Snapdragon NPU (AI Hub) |
 |---|---|---|

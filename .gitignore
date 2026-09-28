@@ -24,3 +24,8 @@ bench_results*.json
 
 # Runtime user memories (created by the add_note tool)
 data/notes/memory.md
+
+# Submission artifacts (form uploads — not repo content)
+submission/
+/Snap Brief.pdf
+/Snap-Pitch-Deck.pptx

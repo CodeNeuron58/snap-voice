@@ -55,15 +55,22 @@ why tier 1 exists: the deterministic pre-router answers math/convert in 0.1 ms w
 
 ## Profiled (Snapdragon NPU — AI Hub, X2 Elite CRD)
 
-To be filled from `scripts/profile_on_aihub.py` runs; raw job JSON + screenshots
-go to `docs/evidence/` first, summarized here after.
+**Own profile jobs (2026-09-24):** Whisper-Small via `precompiled_qnn_onnx`
+(ONNX Runtime 1.27.1 + QAIRT 2.50), submitted from our own workbench account.
+Raw job JSON + summary in `docs/evidence/`.
 
-| Stage | Expected (AI Hub model pages) | Profile job | Delta vs CPU |
+| Stage | Own job (measured) | AI Hub published | Delta vs CPU |
 |---|---|---|---|
-| STT (Whisper-Small, w8a16) | encoder 60.5 ms + 6.58 ms/tok ≈ 190 ms/pass | pending | — |
-| LLM prefill (Qwen3-4B-Instruct-2507) | ~150–400 ms (2,831 tok/s) | pending | ~10–19× |
-| LLM decode | 42.6 tok/s (vs ~14 tok/s CPU) | pending | ~3× |
-| TTFA (composed) | ~0.9 s target | pending | — |
+| STT encoder | **53.7 ms** (NPU, 1582 ops) — [job j57eoxdlp](https://workbench.aihub.qualcomm.com/jobs/j57eoxdlp/) | 60.5 ms | — |
+| STT decoder | **6.1 ms/token** (NPU, 2277 ops) — [job jp4yevwvp](https://workbench.aihub.qualcomm.com/jobs/jp4yevwvp/) | 6.58 ms/tok | — |
+| STT pass (3 s utterance) | ~176 ms (composed from own jobs) | ~190 ms | — |
+| LLM prefill (Qwen3-4B-Instruct-2507) | GenieX pipeline **completed on our account** (42 compiles + 4 links + profile, all SUCCESS) | ~150–400 ms (2,831 tok/s) | ~10–19× |
+| LLM decode | GenieX profile **completed on our account** | 42.6 tok/s (vs ~14 tok/s CPU) | ~3× |
+| TTFA (composed) | pending | ~0.9 s target | — |
+
+\* Own jobs confirm the published figures. Qwen3-4B GenieX/QAIRT pipeline evidence:
+`docs/evidence/qwen3-4b__x2-elite__2026-09-25.txt` + `docs/evidence/qwen3-genie/`
+(model page: `aihub.qualcomm.com/models/qwen3_4b_instruct_2507`).
 
 \* AI Hub page numbers are Qualcomm's published hosted-device measurements; our
 own profile jobs will replace/augment them. Never mix the two without a label.

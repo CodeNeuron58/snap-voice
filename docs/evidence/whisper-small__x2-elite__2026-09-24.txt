@@ -1,0 +1,39 @@
+Snap — own AI Hub profile jobs (evidence)
+Date: 2026-09-24
+Device: Snapdragon X2 Elite CRD (Hexagon v81, soc-model 88)
+Runtime: precompiled_qnn_onnx (ONNX Runtime 1.27.1 + QAIRT/Qualcomm AI Engine Direct 2.50.0)
+Submitter: Biprayan Choudhuri (own workbench account)
+
+Encoder profile job: https://workbench.aihub.qualcomm.com/jobs/j57eoxdlp/
+  Estimated inference time : 53.7 ms
+  Compute unit             : npu (1582 ops), gpu 0, cpu 0
+
+Decoder profile job: https://workbench.aihub.qualcomm.com/jobs/jp4yevwvp/
+  Estimated inference time : 6.1 ms
+  Compute unit             : npu (2277 ops), gpu 0, cpu 0
+
+Interpretation: encoder 53.7 ms + decoder 6.1 ms/token — consistent with a
+~190 ms STT pass for a typical short utterance (matches the AI Hub published
+figures we cite; now verified by our own jobs).
+
+--- Screenshot evidence (in docs/evidence/) ---
+- whisper-small__x2-elite__2026-09-24.png
+    PROFILE tab, both jobs listed: decoder 6.1 ms / 60 MB, encoder 53.7 ms / 133 MB
+- whisper-small__x2-elite__decoder__2026-09-24.png
+    Decoder profile detail (jp4yevwvp): device Snapdragon X2 Elite CRD, Windows 11,
+    SC8480XP; ONNX Runtime 1.27.1, QAIRT 2.50.0; metrics 6.1 ms / 60 MB / NPU 2277 ops
+- whisper-small__x2-elite__decoder-metrics__2026-09-24.png
+    Decoder detailed metrics: inference min 6.1 ms, median 6.7 ms; first app load
+    555.2 ms (covered by app boot warm-up); peak 60 MB
+
+Encoder detail screenshot: pending (job j57eoxdlp, expect 53.7 ms / 133 MB / NPU 1582 ops)
+
+--- Final screenshot inventory (complete) ---
+- whisper-small__x2-elite__2026-09-24.png
+    PROFILE tab overview: both jobs — decoder 6.1 ms / 60 MB, encoder 53.7 ms / 133 MB
+- whisper-small__x2-elite__encoder__2026-09-24.png
+    Encoder detail (j57eoxdlp): X2 Elite CRD, Windows 11, QAIRT 2.50.0, ONNX Runtime 1.27.1;
+    metrics 53.7 ms / 133 MB / NPU 1582 ops (median 54.6 ms)
+- whisper-small__x2-elite__decoder__2026-09-24.png
+    Decoder metrics (jp4yevwvp): 6.1 ms min / 6.7 ms median, 60 MB, NPU 2277 ops;
+    first app load 555.2 ms (covered by app boot warm-up)

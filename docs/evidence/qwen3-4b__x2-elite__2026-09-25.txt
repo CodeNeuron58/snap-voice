@@ -1,0 +1,25 @@
+Snap — Qwen3-4B-Instruct-2507 GenieX/QAIRT profile (evidence)
+Date: 2026-09-25
+Device: Snapdragon X2 Elite CRD (Hexagon v81, SC8480XP, Windows 11)
+Runtime: geniex_qairt (QAIRT 2.50.0, ONNX Runtime 1.27.1), W4A16 asset from
+Qualcomm AI Hub official S3 (qaihub-public-assets)
+Submitter: Biprayan Choudhuri (own workbench account)
+
+Pipeline (all completed on Qualcomm cloud):
+- 42 compile jobs (per-layer-group): all SUCCESS (workbench COMPILE tab)
+- 4 link jobs (context binary assembly): part1 jpxl0l2lp SUCCESS;
+  parts 2-4 (j5m090y9g, jgnz1z8qg, jprlxlj7p) SUCCESS/LINKING at capture time
+- Main profile job: jp2rornqg — SUCCESS
+  https://workbench.aihub.qualcomm.com/jobs/jp2rornqg/
+  Per-part profile results (JSON) + runtime log saved in this folder.
+
+Per-part measured (prompt_ar128 / context 512 variant, NPU):
+- part1 per-token inference: min 172 us, median ~200 us (all_inference_times in JSON)
+- part1 run: 2 iterations in 0.504 s on-device
+
+Aggregate tok/s summary: displayed on the workbench profile job page
+(local script died at the summary-print step due to a network failure;
+the cloud pipeline itself completed successfully).
+
+Local artifacts removed after evidence capture (model cache, ~43 GB) —
+re-downloadable from AI Hub if ever needed.

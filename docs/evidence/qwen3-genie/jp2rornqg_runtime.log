@@ -1,0 +1,262 @@
+[25/Sept/2026:16:54:45 -08:00: profiler/info] Detected Qualcomm SOC=SC8480XP. SOC Model=88, Hexagon arch=81, supports QNN=true, unsigned PDs=true, fp16=true, QNN flavor=default.
+[25/Sept/2026:16:54:45 -08:00: profiler/info] This device type has up to 1 HTP cores but this may not reflect the current device's configuration.
+[25/Sept/2026:16:54:45 -08:00: profiler/info] -=- Tungsten running task: compiling -=-
+[25/Sept/2026:16:54:45 -08:00: profiler/info] Setting Windows DLL directory to C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc.
+[25/Sept/2026:09:54:45 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Compiled with t = 0 us and usage: before = 0.0 kB; peakBefore = 0.0 kB; mallocUnusedBefore = 0.0 kB; after = 0.0 kB; peakAfter = 0.0 kB; mallocUnusedAfter = 0.0 kB; increase = 0.0-0.0 kB; peak = 0.0-0.0 kB
+[25/Sept/2026:09:54:45 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Saving results to C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:16:54:45 -08:00: profiler/info] Detected Qualcomm SOC=SC8480XP. SOC Model=88, Hexagon arch=81, supports QNN=true, unsigned PDs=true, fp16=true, QNN flavor=default.
+[25/Sept/2026:16:54:45 -08:00: profiler/info] This device type has up to 1 HTP cores but this may not reflect the current device's configuration.
+[25/Sept/2026:16:54:45 -08:00: profiler/info] -=- Tungsten running task: loading -=-
+[25/Sept/2026:16:54:45 -08:00: profiler/info] Setting Windows DLL directory to C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc.
+[25/Sept/2026:09:54:45 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading previously saved results in C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:45 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading QNN model Models/model.bin.
+[25/Sept/2026:09:54:45 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 5876
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 21327872
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 21327872
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 266600
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 260384
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 14632
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 5038080
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 5038080
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Current memory commmit: 4920.0 kB.
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found QNN interface provider with API version 2.34.
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Initializing HtpProvider
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN backend from C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnHtp.dll (version 5.45.0; core API 2.34.0; build ID v2.45.0.260326154327)
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnSystem.dll, with version 1.9.0.
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN context binary with build id=v2.45.0.260326154327, for soc '' with 1 cores.
+[25/Sept/2026:09:54:46 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Creating context from binary with 1 configurations set.
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:09:54:46 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Unable to set thread name
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl1024_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl2048_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl3072_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl4096_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl512_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl1024_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl2048_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl3072_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl4096_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded graph prompt_ar128_cl512_1_of_4.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 431246
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1733455872
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1733455872
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3718376
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3717792
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 23096
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19468288
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19468288
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Loaded Cold with t = 742685 us and usage: before = 4920.0 kB; peakBefore = 4920.0 kB; mallocUnusedBefore = 0.0 kB; after = 19012.0 kB; peakAfter = 19012.0 kB; mallocUnusedAfter = 0.0 kB; increase = 14092.0-14092.0 kB; peak = 14092.0-14092.0 kB
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Saving results to C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:47 -07:00: profiler/info]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:16:54:47 -08:00: profiler/info] Detected Qualcomm SOC=SC8480XP. SOC Model=88, Hexagon arch=81, supports QNN=true, unsigned PDs=true, fp16=true, QNN flavor=default.
+[25/Sept/2026:16:54:47 -08:00: profiler/info] This device type has up to 1 HTP cores but this may not reflect the current device's configuration.
+[25/Sept/2026:16:54:47 -08:00: profiler/info] -=- Tungsten running task: loading -=-
+[25/Sept/2026:16:54:47 -08:00: profiler/info] Setting Windows DLL directory to C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc.
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading previously saved results in C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading QNN model Models/model.bin.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 5883
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 21348352
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 21348352
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 266600
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 259904
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 13608
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 4972544
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 4972544
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Current memory commmit: 4856.0 kB.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found QNN interface provider with API version 2.34.
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Initializing HtpProvider
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN backend from C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnHtp.dll (version 5.45.0; core API 2.34.0; build ID v2.45.0.260326154327)
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnSystem.dll, with version 1.9.0.
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN context binary with build id=v2.45.0.260326154327, for soc '' with 1 cores.
+[25/Sept/2026:09:54:47 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Creating context from binary with 1 configurations set.
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:09:54:47 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Unable to set thread name
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl1024_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl2048_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl3072_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl4096_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl512_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl1024_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl2048_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl3072_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl4096_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded graph prompt_ar128_cl512_1_of_4.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 397909
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1597214720
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1597214720
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3452144
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3451560
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 23784
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19230720
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19230720
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Loaded Warm with t = 607592 us and usage: before = 4856.0 kB; peakBefore = 4856.0 kB; mallocUnusedBefore = 0.0 kB; after = 18780.0 kB; peakAfter = 18780.0 kB; mallocUnusedAfter = 0.0 kB; increase = 13924.0-13924.0 kB; peak = 13924.0-13924.0 kB
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Saving results to C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:48 -07:00: profiler/info]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:16:54:48 -08:00: profiler/info] Detected Qualcomm SOC=SC8480XP. SOC Model=88, Hexagon arch=81, supports QNN=true, unsigned PDs=true, fp16=true, QNN flavor=default.
+[25/Sept/2026:16:54:48 -08:00: profiler/info] This device type has up to 1 HTP cores but this may not reflect the current device's configuration.
+[25/Sept/2026:16:54:48 -08:00: profiler/info] -=- Tungsten running task: performing inference -=-
+[25/Sept/2026:16:54:48 -08:00: profiler/info] Setting Windows DLL directory to C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc.
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading previously saved results in C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Starting profiler
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading QNN model Models/model.bin.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 5878
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 21344256
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 21344256
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 266584
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 259984
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 13800
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 4956160
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 4956160
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Current memory commmit: 4840.0 kB.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found QNN interface provider with API version 2.34.
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Initializing HtpProvider
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN backend from C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnHtp.dll (version 5.45.0; core API 2.34.0; build ID v2.45.0.260326154327)
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnSystem.dll, with version 1.9.0.
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN context binary with build id=v2.45.0.260326154327, for soc '' with 1 cores.
+[25/Sept/2026:09:54:48 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Creating context from binary with 1 configurations set.
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:09:54:48 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Unable to set thread name
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl1024_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl2048_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl3072_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl4096_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl512_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl1024_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl2048_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl3072_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl4096_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded graph prompt_ar128_cl512_1_of_4.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 397914
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1597255680
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1597255680
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3452128
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3451544
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 23096
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19259392
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19259392
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Loaded Warm with t = 587656 us and usage: before = 4840.0 kB; peakBefore = 4840.0 kB; mallocUnusedBefore = 0.0 kB; after = 18808.0 kB; peakAfter = 18808.0 kB; mallocUnusedAfter = 0.0 kB; increase = 13968.0-13968.0 kB; peak = 13968.0-13968.0 kB
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Applying performance mode Burst to device 0, core 0.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 397975
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1597505536
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1597505536
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3452504
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3452504
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 25160
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19263488
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19263488
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Current memory commmit: 18812.0 kB.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 397989
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1597562880
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1597562880
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3454280
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3454280
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 27080
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19271680
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19271680
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Successfully ran model for 50 iterations across 1 batches in 0.013 sec.
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Performed Inference with t = 172 us and usage: before = 18812.0 kB; peakBefore = 18812.0 kB; mallocUnusedBefore = 0.0 kB; after = 18820.0 kB; peakAfter = 18820.0 kB; mallocUnusedAfter = 0.0 kB; increase = 8.0-8.0 kB; peak = 8.0-8.0 kB
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Saving results to C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:49 -07:00: profiler/info]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:16:54:49 -08:00: profiler/info] Detected Qualcomm SOC=SC8480XP. SOC Model=88, Hexagon arch=81, supports QNN=true, unsigned PDs=true, fp16=true, QNN flavor=default.
+[25/Sept/2026:16:54:49 -08:00: profiler/info] This device type has up to 1 HTP cores but this may not reflect the current device's configuration.
+[25/Sept/2026:16:54:49 -08:00: profiler/info] -=- Tungsten running task: performing inference by layer -=-
+[25/Sept/2026:16:54:49 -08:00: profiler/info] Setting Windows DLL directory to C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc.
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading previously saved results in C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Starting profiler
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loading QNN model Models/model.bin.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 5893
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 21405696
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 21405696
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 266584
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 260464
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 14824
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 5017600
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 5017600
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Current memory commmit: 4900.0 kB.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found QNN interface provider with API version 2.34.
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Initializing HtpProvider
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN backend from C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnHtp.dll (version 5.45.0; core API 2.34.0; build ID v2.45.0.260326154327)
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:49 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Found asset Models/model.bin in C:\Temp\TestContent\Models/model.bin.
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded C:\Temp\TestContent\bin\qnn_sdk\default\2.45.0\aarch64-windows-msvc\QnnSystem.dll, with version 1.9.0.
+[25/Sept/2026:09:54:49 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded QNN context binary with build id=v2.45.0.260326154327, for soc '' with 1 cores.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Creating context from binary with 1 configurations set.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin]  <W> Unable to set thread name
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl1024_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl2048_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl3072_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: prompt_ar128_cl4096_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl512_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl1024_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl2048_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl3072_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] Not loading graph: token_ar1_cl4096_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Loaded graph prompt_ar128_cl512_1_of_4.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 431278
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1733496832
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1733496832
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3718360
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3717776
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 23096
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19419136
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19419136
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Loaded Warm with t = 1483300 us and usage: before = 4900.0 kB; peakBefore = 4900.0 kB; mallocUnusedBefore = 0.0 kB; after = 18964.0 kB; peakAfter = 18964.0 kB; mallocUnusedAfter = 0.0 kB; increase = 14064.0-14064.0 kB; peak = 14064.0-14064.0 kB
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Applying performance mode Burst to device 0, core 0.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 431340
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1733750784
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1733750784
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3718736
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3718736
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 25160
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19427328
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19427328
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Current memory commmit: 18972.0 kB.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 11 profiler events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 3 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 11 profiler events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 3 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Got 0 profiler sub-events.
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PageFaultCount: 431408
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakWorkingSetSize: 1733963776
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] WorkingSetSize: 1733935104
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakPagedPoolUsage: 3720704
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPagedPoolUsage: 3720128
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] QuotaPeakNonPagedPoolUsage: 27688
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PagefileUsage: 19402752
+[25/Sept/2026:09:54:51 -07:00: profiler/debug] [job_id: jp2rornqg] [model.bin] PeakPagefileUsage: 19480576
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Successfully ran model for 2 iterations across 1 batches in 0.504 sec.
+[25/Sept/2026:09:54:51 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Status Successfully Performed Inference By Layer with t = 9132 us and usage: before = 18972.0 kB; peakBefore = 18972.0 kB; mallocUnusedBefore = 0.0 kB; after = 18948.0 kB; peakAfter = 19024.0 kB; mallocUnusedAfter = 0.0 kB; increase = 0.0-0.0 kB; peak = 52.0-52.0 kB
+[25/Sept/2026:09:54:52 -07:00: profiler/info] [job_id: jp2rornqg] [model.bin] Saving results to C:\Temp\QDC_logs\TungstenArtifacts\Results\job_jp2rornqg\job_jp2rornqg_results.bin
+[25/Sept/2026:09:54:52 -07:00: profiler/info]  <W> m_CFBCallbackInfoObj is not initialized, return emptyList
